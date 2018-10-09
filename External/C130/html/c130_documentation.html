@@ -1,0 +1,511 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>c130 documentation</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-09-30"><meta name="DC.source" content="c130_documentation.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>c130 documentation</h1><!--introduction--><p>The c130 function draws a simple 3D airplane modelled after the Lockheed C-130.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1"><tt>c130</tt> Syntax</a></li><li><a href="#2"><tt>c130</tt> Description</a></li><li><a href="#3"><tt>xyz2rpy</tt> Syntax &amp; Description</a></li><li><a href="#4">Example 1: Very Simple</a></li><li><a href="#5">Example 2: Specify Colors</a></li><li><a href="#6">Example 3: Define Location</a></li><li><a href="#10">Example 4: Specify orientation</a></li><li><a href="#14">Example 5: ANIMATING FLIGHT</a></li><li><a href="#15">Example 5a: Load and plot topography</a></li><li><a href="#16">Example 5b: Generate flight lines</a></li><li><a href="#17">Example 5c: Specify roll, pitch, and yaw</a></li><li><a href="#18">Example 5d: Lights, camera</a></li><li><a href="#19">Example 5e: Animate</a></li><li><a href="#22">Author Info</a></li></ul></div><h2><tt>c130</tt> Syntax<a name="1"></a></h2><pre>c130
+c130(x,y,z)
+c130(...,'roll',RollDegrees)
+c130(...,'pitch',PitchDegrees)
+c130(...,'yaw',YawDegrees)
+c130(...,'color',AirplaneColor)
+c130(...,'fuselage',FuseLageColor)
+c130(...,'wing',WingColor)
+c130(...,'tailwing',TailwingColor)
+c130(...,'fin',FinColor)
+c130(...,'prop',PropellerColor)
+c130(...,'scale',SizeScaleFactor)
+c130(...,'z',ZScaleFactor)
+c130(...,'linestyle','LineStyle')
+c130(...,'linecolor',LineColor)
+h = c130(...)</pre><h2><tt>c130</tt> Description<a name="2"></a></h2><p><tt>c130</tt> draws a 3D airplane.</p><p><tt>c130(x,y,z)</tt> draws an airplane centered approximately at the location given by <tt>x,y,z</tt>, where <tt>x</tt>, <tt>y</tt>, and <tt>z</tt> must be scalar values.</p><p><tt>c130(...,'roll',RollDegrees)</tt> specifies roll of the aircraft in degrees relative to the approximate center of gravity of the aircraft.</p><p><tt>c130(...,'pitch',PitchDegrees)</tt> specifies pitch of the aircraft in degrees.</p><p><tt>c130(...,'yaw',YawDegrees)</tt> specifies yaw of the aircraft in degrees in the global coordinate system. The <tt>xyz2rpy</tt> function may help with determining appropriate yaw values.</p><p><tt>c130(...,'color',AirplaneColor)</tt> specifies a color of all surfaces of the plane.  Color may be given by Matlab color name (e.g., <tt>'red'</tt>), Matlab color abbreviation (e.g., <tt>'r'</tt>), or RGB value (e.g., <tt>[1 0 0]</tt>). The <tt>'color'</tt> option may be paired with options for specifying colors of specific parts of the plane.  For example, <tt>c130('color','b','wing',y)</tt> creates a blue airplane with yellow wings. Default color is gray.</p><p><tt>c130(...,'fuselage',FuselageColor)</tt> specifies fuselage color.</p><p><tt>c130(...,'wing',WingColor)</tt> specifies wing color.</p><p><tt>c130(...,'tailwing',TailwingColor)</tt> specifies color of horizontal stabilizer wings at the tail of the plane.</p><p><tt>c130(...,'fin',FinColor)</tt> specifies color of the vertical stabilizer fin at the tail of the plane.</p><p><tt>c130(...,'prop',PropellerColor)</tt> specifies propeller color.</p><p><tt>c130(...,'scale',SizeScaleFactor)</tt> scales dimensions of the plane by some scalar factor. By default, <tt>c130</tt> draws an airplane with dimensions which approximately match the dimensions C-130 airplane in meters.  If you'd like to draw a C-130 in dimensions of feet, try <tt>c130('scale',3.281)</tt>.</p><p><tt>c130(...,'z',ZScaleFactor)</tt> scales only vertical dimensions by some scalar value.  This may be useful if you're animating an airplane in a coordinate system where the vertical dimension is stretched to show relief.  If your axes are not equal, consider a <tt>ZScaleFactor</tt> given by the ratio of <tt>(xlim(2)-xlim(1))/(zlim(2)-zlim(1))</tt>.</p><p><tt>c130(...,'linestyle','LineStyle')</tt> specifies style of the lines connecting surface vertices. Default is <tt>'-'</tt>, but can be set to any valid linestyle, including <tt>'none'</tt> to show a smooth surface.</p><p><tt>c130(...,'linecolor',LineColor)</tt> specifies edge color of lines connecting surface verticies. Default line color is black.</p><p><tt>h = c130(...)</tt> returns handles of the 13 surface objects created by <tt>c130</tt>. Handles correspond to the following:</p><div><ul><li><tt>h(1)</tt>: main fuselage.</li><li><tt>h(2)</tt>: nose.</li><li><tt>h(3)</tt>: tail section of fuselage.</li><li><tt>h(4)</tt>: top side of main wing.</li><li><tt>h(5)</tt>: under side of main wing.</li><li><tt>h(6)</tt>: top side of tail wing.</li><li><tt>h(7)</tt>: under side of tail wing.</li><li><tt>h(8)</tt>: right side of fin.</li><li><tt>h(9)</tt>: left side of fin.</li><li><tt>h(10:13)</tt>: propellers.</li></ul></div><h2><tt>xyz2rpy</tt> Syntax &amp; Description<a name="3"></a></h2><p>As far as melon scratchers go, figuring out appropriate values of roll, pitch, and yaw can be a real honeydoodler.  If you're creating an animation and you have some path along which you want the airplane to fly, the <tt>xyz2rpy</tt> function will offer values of roll, pitch, and yaw based on local slopes of the airplane path.</p><p><tt>[roll,pitch,yaw] = xyz2rpy(x,y,z)</tt> returns roll, pitch, and yaw in degrees for a path given by global coordinates <tt>x,y,z</tt>.  Inputs <tt>x</tt>, <tt>y</tt>, and <tt>z</tt> can be vectors of matching lengths, or if a value is constant (e.g., if elevation does not change), a scalar value may be used.</p><p><tt>[roll,pitch,yaw] = xyz2rpy(x,y,z,RollFactor)</tt> exaggerates or reduces roll by <tt>RollFactor</tt>. This may be linked to speed of the aircraft. If the airplane is moving very fast, you may want to use a <tt>RollFactor</tt> much greater than 1.  To fly a plane without any roll, set <tt>RollFactor</tt> to 0. <tt>RollFactor</tt> can be scalar or an array matching the dimensions of <tt>x</tt>. Default <tt>RollFactor</tt> is unity.</p><h2>Example 1: Very Simple<a name="4"></a></h2><p>For starters, draw a simple airplane:</p><pre class="codeinput">c130
+</pre><img vspace="5" hspace="5" src="c130_documentation_01.png" alt=""> <h2>Example 2: Specify Colors<a name="5"></a></h2><p>Draw a blue airplane with red wings and no edge lines:</p><pre class="codeinput">c130(<span class="string">'color'</span>,<span class="string">'blue'</span>,<span class="keyword">...</span>
+    <span class="string">'wing'</span>,<span class="string">'red'</span>,<span class="keyword">...</span>
+    <span class="string">'tailwing'</span>,<span class="string">'red'</span>,<span class="keyword">...</span>
+    <span class="string">'lines'</span>,<span class="string">'none'</span>)
+</pre><img vspace="5" hspace="5" src="c130_documentation_02.png" alt=""> <h2>Example 3: Define Location<a name="6"></a></h2><p>Draw a yellow airplane at the origin and gray airplane at x = 20, y = 10, z = 40:</p><pre class="codeinput">c130(<span class="string">'color'</span>,<span class="string">'yellow'</span>)
+hold <span class="string">on</span>;
+c130(20,10,40)
+</pre><img vspace="5" hspace="5" src="c130_documentation_03.png" alt=""> <p>We can change that view to a top view:</p><pre class="codeinput">view([0 90])
+</pre><img vspace="5" hspace="5" src="c130_documentation_04.png" alt=""> <p>...or a side view:</p><pre class="codeinput">view([90 0])
+</pre><img vspace="5" hspace="5" src="c130_documentation_05.png" alt=""> <p>...or a front view:</p><pre class="codeinput">view([-180 0])
+</pre><img vspace="5" hspace="5" src="c130_documentation_06.png" alt=""> <h2>Example 4: Specify orientation<a name="10"></a></h2><p>We can set roll, pitch, and yaw, either individually, or all together. Let's add a green plane rolling at 30 degrees:</p><pre class="codeinput">c130(0,0,20,<span class="string">'color'</span>,<span class="string">'g'</span>,<span class="keyword">...</span>
+    <span class="string">'lines'</span>,<span class="string">'none'</span>,<span class="string">'roll'</span>,30)
+</pre><img vspace="5" hspace="5" src="c130_documentation_07.png" alt=""> <p>Now an orange airplane with a 20 degree pitch and a 90 degree yaw.  We know from <a href="http://www.mathworks.com/matlabcentral/fileexchange/46872-intuitive-rgb-color-values-from-xkcd/content/demo/html/rgb_demo.html"><tt>rgb</tt></a> that orange has RGB values of <tt>[0.9765 0.4510 0.0235]</tt>.</p><pre class="codeinput">c130(30,10,20,<span class="keyword">...</span>
+    <span class="string">'color'</span>,[0.9765 0.4510 0.0235],<span class="keyword">...</span>
+    <span class="string">'pitch'</span>,20,<span class="keyword">...</span>
+    <span class="string">'yaw'</span>,90)
+</pre><img vspace="5" hspace="5" src="c130_documentation_08.png" alt=""> <p>Return to a 3D view:</p><pre class="codeinput">view(3)
+</pre><img vspace="5" hspace="5" src="c130_documentation_09.png" alt=""> <p>And just for kicks, let's add a big red plane, twice the size of the others:</p><pre class="codeinput">c130(30,10,0,<span class="keyword">...</span>
+    <span class="string">'color'</span>,<span class="string">'red'</span>,<span class="keyword">...</span>
+    <span class="string">'pitch'</span>,20,<span class="keyword">...</span>
+    <span class="string">'yaw'</span>,90,<span class="keyword">...</span>
+    <span class="string">'roll'</span>,-15,<span class="keyword">...</span>
+    <span class="string">'scale'</span>,2)
+view([42 8])
+axis <span class="string">tight</span>
+</pre><img vspace="5" hspace="5" src="c130_documentation_10.png" alt=""> <h2>Example 5: ANIMATING FLIGHT<a name="14"></a></h2><h2>Example 5a: Load and plot topography<a name="15"></a></h2><p>Let's start by creating a mountain for our plane to fly by. We'll use Matlab's built-in peaks data for this, and we'll tweak the data set a little bit to set negative elevations to zero and rescale <tt>X</tt> and <tt>Y</tt> to larger dimensions.</p><pre class="codeinput"><span class="comment">% Load and tweak peaks data:</span>
+[Y,X,Z] = peaks;
+Z(Z&lt;0)=0;
+X = flipud(X*35);
+Y = Y*35;
+Z = Z*25;
+
+<span class="comment">% Plot peaks surface</span>
+figure(<span class="string">'pos'</span>,[50 50 900 660])
+hp = surf(X,Y,Z);
+axis([-100 100 -100 100 0 200])
+colormap(hot(256))
+shading <span class="string">interp</span>
+lighting <span class="string">gouraud</span>
+camlight
+zoom(1.5)
+hold <span class="string">on</span>
+</pre><img vspace="5" hspace="5" src="c130_documentation_11.png" alt=""> <h2>Example 5b: Generate flight lines<a name="16"></a></h2><p>Now our candycornesque landscape is plotted and we can create paths for airplanes. For this example, we'll scale the paths based on the number of frames we'll ultimately want in our movie show.</p><pre class="codeinput">frames = 300; <span class="comment">% number of frames in our movie show.</span>
+
+<span class="comment">% Plane 1: Periwinkle plane flies left to right:</span>
+y1 = linspace(-250,400,frames);
+x1 = zeros(size(y1));
+z1 = 100*ones(size(y1));
+path1 = plot3(x1,y1,z1,<span class="string">'.-'</span>,<span class="string">'color'</span>,[0.5569 0.5098 0.9961]);
+
+<span class="comment">% Plane 2: Red plane flies right to left:</span>
+y2 = fliplr(y1);
+x2 = x1;
+z2 = z1+50;
+path2 = plot3(x2,y2,z2,<span class="string">'r.-'</span>);
+
+<span class="comment">% Plane 3: Gray and blue plane flies 'round the mountain:</span>
+x3 = zeros(size(x2));
+x3(201:273) = -80*sind((0:15:3*360)-90)-80;
+y3 = zeros(size(x2));
+y3(1:175) = -250;
+y3(176:200) = linspace(-250,0,25);
+y3(201:273) = 80*cosd((0:15:3*360)-90);
+y3(274:end) = linspace(0,250,27);
+z3 = 120+40*cos(linspace(pi,4*pi,length(y3)))+y3/4;
+path3 = plot3(x3,y3,z3,<span class="string">'b.-'</span>);
+
+<span class="comment">% Set view:</span>
+view([70 33])
+axis([-100 100 -100 100 0 200])
+grid <span class="string">off</span>
+set(gca,<span class="string">'color'</span>,<span class="string">'none'</span>)
+</pre><img vspace="5" hspace="5" src="c130_documentation_12.png" alt=""> <h2>Example 5c: Specify roll, pitch, and yaw<a name="17"></a></h2><p>You can specify roll, pitch and yaw in a few different ways. In the case of airplane 2, which flies from right to left (in the negative y direction), a constant yaw value of -180 is appropriate.</p><p>We can also make up values for roll, pitch, and yaw.  Below, we add two barrel rolls starting at frame 185 for the red airplane.</p><p>For more complex x,y,z paths, manually defining roll, pitch, and yaw can be a real exercise in bookkeeping. For those cases, we can use <tt>xyz2rpy</tt>, which does a mediocre job of it.  Sometimes <tt>xyz2rpy</tt> underestimates or overestimates roll, so let's exaggerate the roll for plane 3 by a factor of 30:</p><pre class="codeinput">yaw2 = -180; <span class="comment">% because the plane is flying toward -y</span>
+roll2 = zeros(size(y2));
+roll2(185:210) = linspace(0,2*360,26);
+
+[roll3,pitch3,yaw3] = xyz2rpy(x3,y3,z3,30);
+</pre><h2>Example 5d: Lights, camera<a name="18"></a></h2><p>Now let's delete those flight paths and ready the camera. We'll also specify azimuth and elevation vectors for the camera.</p><pre class="codeinput"><span class="comment">%  delete([path1 path2 path3])</span>
+<span class="comment">%  az = linspace(70,85,frames);</span>
+<span class="comment">%  el = linspace(33,29,frames);</span>
+</pre><h2>Example 5e: Animate<a name="19"></a></h2><p>Now it's time to loop the animation.</p><pre>for k = 1:frames</pre><pre>    % draw periwinkle plane:
+    h1 = c130(x1(k),y1(k),z1(k),...
+        'color',[0.5569 0.5098 0.9961]);</pre><pre>    % draw red plane:
+    h2 = c130(x2(k),y2(k),z2(k),...
+        'roll',roll2(k),...
+        'yaw',yaw2,...
+        'color','red');</pre><pre>    % draw fancy plane:
+    h3 = c130(x3(k),y3(k),z3(k),...
+        'lines','none',...
+        'wings','b',...
+        'tail','r',...
+        'roll',roll3(k),...
+        'pitch',pitch3(k),...
+        'yaw',yaw3(k));</pre><pre>    % set view and take a picture:
+    view([az(k) el(k)])
+    axis([-100 100 -100 100 0 200])
+    drawnow</pre><pre>    % delete the planes we just drew:
+    delete([h1 h2 h3]);
+end</pre><p>Using <a href="http://www.mathworks.com/help/matlab/ref/videowriter-class.html"><tt>videoWriter</tt></a>, the loop above produces this video:</p><p>
+<iframe id="ytplayer" type="text/html" width="640" height="480"
+src="http://www.youtube.com/embed/kmDCkq815M4?rel=0"
+frameborder="0" allowfullscreen></iframe>
+</p><h2>Author Info<a name="22"></a></h2><p><a href="http://www.chadagreene.com">Chad A. Greene</a> of the University of Texas Institute for Geophysics (<a href="http://www.ig.utexas.edu/people/students/cgreene/">UTIG</a>) wrote <tt>c130</tt>, <tt>xyz2rpy</tt>, and this documentation file on a sunny Saturday afternoon in September, 2014.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% c130 documentation
+% The c130 function draws a simple 3D airplane modelled after the Lockheed
+% C-130.
+
+%% |c130| Syntax 
+% 
+%  c130 
+%  c130(x,y,z)
+%  c130(...,'roll',RollDegrees)
+%  c130(...,'pitch',PitchDegrees)
+%  c130(...,'yaw',YawDegrees)
+%  c130(...,'color',AirplaneColor)
+%  c130(...,'fuselage',FuseLageColor)
+%  c130(...,'wing',WingColor)
+%  c130(...,'tailwing',TailwingColor)
+%  c130(...,'fin',FinColor)
+%  c130(...,'prop',PropellerColor)
+%  c130(...,'scale',SizeScaleFactor)
+%  c130(...,'z',ZScaleFactor)
+%  c130(...,'linestyle','LineStyle')
+%  c130(...,'linecolor',LineColor)
+%  h = c130(...)
+
+%% |c130| Description
+%
+% |c130| draws a 3D airplane.
+% 
+% |c130(x,y,z)| draws an airplane centered approximately at the location
+% given by |x,y,z|, where |x|, |y|, and |z| must be scalar values. 
+% 
+% |c130(...,'roll',RollDegrees)| specifies roll of the aircraft in degrees
+% relative to the approximate center of gravity of the aircraft. 
+%
+% |c130(...,'pitch',PitchDegrees)| specifies pitch of the aircraft in
+% degrees.
+%
+% |c130(...,'yaw',YawDegrees)| specifies yaw of the aircraft in degrees in
+% the global coordinate system. The |xyz2rpy| function may help with
+% determining appropriate yaw values. 
+%
+% |c130(...,'color',AirplaneColor)| specifies a color of all surfaces of
+% the plane.  Color may be given by Matlab color name (e.g., |'red'|),
+% Matlab color abbreviation (e.g., |'r'|), or RGB value (e.g., |[1 0 0]|).
+% The |'color'| option may be paired with options for specifying colors of
+% specific parts of the plane.  For example, |c130('color','b','wing',y)|
+% creates a blue airplane with yellow wings. Default color is gray. 
+%
+% |c130(...,'fuselage',FuselageColor)| specifies fuselage color. 
+%
+% |c130(...,'wing',WingColor)| specifies wing color. 
+%
+% |c130(...,'tailwing',TailwingColor)| specifies color of horizontal
+% stabilizer wings at the tail of the plane. 
+%
+% |c130(...,'fin',FinColor)| specifies color of the vertical stabilizer fin
+% at the tail of the plane. 
+%
+% |c130(...,'prop',PropellerColor)| specifies propeller color. 
+%
+% |c130(...,'scale',SizeScaleFactor)| scales dimensions of the plane by
+% some scalar factor. By default, |c130| draws an airplane with dimensions
+% which approximately match the dimensions C-130 airplane in meters.  If you'd 
+% like to draw a C-130 in dimensions of feet, try |c130('scale',3.281)|. 
+%
+% |c130(...,'z',ZScaleFactor)| scales only vertical dimensions by some
+% scalar value.  This may be useful if you're animating an airplane in a
+% coordinate system where the vertical dimension is stretched to show
+% relief.  If your axes are not equal, consider a |ZScaleFactor| given by
+% the ratio of |(xlim(2)-xlim(1))/(zlim(2)-zlim(1))|. 
+%
+% |c130(...,'linestyle','LineStyle')| specifies style of the lines
+% connecting surface vertices. Default is |'-'|, but can be set to any
+% valid linestyle, including |'none'| to show a smooth surface. 
+%
+% |c130(...,'linecolor',LineColor)| specifies edge color of lines
+% connecting surface verticies. Default line color is black. 
+% 
+% |h = c130(...)| returns handles of the 13 surface objects created by
+% |c130|. Handles correspond to the following: 
+% 
+% * |h(1)|: main fuselage. 
+% * |h(2)|: nose. 
+% * |h(3)|: tail section of fuselage. 
+% * |h(4)|: top side of main wing. 
+% * |h(5)|: under side of main wing. 
+% * |h(6)|: top side of tail wing. 
+% * |h(7)|: under side of tail wing. 
+% * |h(8)|: right side of fin. 
+% * |h(9)|: left side of fin. 
+% * |h(10:13)|: propellers.
+
+%% |xyz2rpy| Syntax & Description
+% As far as melon scratchers go, figuring out appropriate values of roll,
+% pitch, and yaw can be a real honeydoodler.  If you're creating an
+% animation and you have some path along which you want the airplane to
+% fly, the |xyz2rpy| function will offer values of roll, pitch, and yaw
+% based on local slopes of the airplane path.  
+% 
+% |[roll,pitch,yaw] = xyz2rpy(x,y,z)| returns roll, pitch, and yaw in
+% degrees for a path given by global coordinates |x,y,z|.  Inputs |x|, |y|, 
+% and |z| can be vectors of matching lengths, or if a value is constant
+% (e.g., if elevation does not change), a scalar value may be used.
+%  
+% |[roll,pitch,yaw] = xyz2rpy(x,y,z,RollFactor)| exaggerates or reduces
+% roll by |RollFactor|. This may be linked to speed of the aircraft. If the airplane
+% is moving very fast, you may want to use a |RollFactor| much greater
+% than 1.  To fly a plane without any roll, set |RollFactor| to 0.
+% |RollFactor| can be scalar or an array matching the dimensions of |x|.
+% Default |RollFactor| is unity. 
+
+%% Example 1: Very Simple
+% For starters, draw a simple airplane: 
+
+c130
+
+%% Example 2: Specify Colors
+% Draw a blue airplane with red wings and no edge lines: 
+
+c130('color','blue',...
+    'wing','red',...
+    'tailwing','red',...
+    'lines','none')
+
+%% Example 3: Define Location
+% Draw a yellow airplane at the origin and gray airplane at x = 20, 
+% y = 10, z = 40: 
+
+c130('color','yellow')
+hold on; 
+c130(20,10,40)
+
+%% 
+% We can change that view to a top view: 
+
+view([0 90])
+
+%% 
+% ...or a side view: 
+
+view([90 0])
+
+%% 
+% ...or a front view: 
+
+view([-180 0])
+
+%% Example 4: Specify orientation
+% We can set roll, pitch, and yaw, either individually, or all together.
+% Let's add a green plane rolling at 30 degrees: 
+
+c130(0,0,20,'color','g',...
+    'lines','none','roll',30)
+
+%% 
+% Now an orange airplane with a 20 degree pitch and a 90 degree yaw.  We know
+% from <http://www.mathworks.com/matlabcentral/fileexchange/46872-intuitive-rgb-color-values-from-xkcd/content/demo/html/rgb_demo.html 
+% |rgb|> that orange has RGB values of |[0.9765 0.4510 0.0235]|. 
+
+c130(30,10,20,...
+    'color',[0.9765 0.4510 0.0235],...
+    'pitch',20,...
+    'yaw',90)
+
+%% 
+% Return to a 3D view: 
+
+view(3)
+
+%% 
+% And just for kicks, let's add a big red plane, twice the size of the
+% others: 
+
+c130(30,10,0,...
+    'color','red',...
+    'pitch',20,...
+    'yaw',90,...
+    'roll',-15,...
+    'scale',2)
+view([42 8])
+axis tight
+
+%% Example 5: ANIMATING FLIGHT
+%% Example 5a: Load and plot topography
+% Let's start by creating a mountain for our plane to fly by. We'll use
+% Matlab's built-in peaks data for this, and we'll tweak the data set a little bit
+% to set negative elevations to zero and rescale |X| and |Y| to larger
+% dimensions. 
+
+% Load and tweak peaks data:
+[Y,X,Z] = peaks;
+Z(Z<0)=0; 
+X = flipud(X*35); 
+Y = Y*35; 
+Z = Z*25; 
+
+% Plot peaks surface
+figure('pos',[50 50 900 660])
+hp = surf(X,Y,Z);
+axis([-100 100 -100 100 0 200])
+colormap(hot(256))
+shading interp
+lighting gouraud
+camlight
+zoom(1.5)
+hold on
+
+%% Example 5b: Generate flight lines
+% Now our candycornesque landscape is plotted and we can create paths for airplanes.
+% For this example, we'll scale the paths based on the number of frames we'll ultimately want
+% in our movie show. 
+
+frames = 300; % number of frames in our movie show. 
+
+% Plane 1: Periwinkle plane flies left to right: 
+y1 = linspace(-250,400,frames); 
+x1 = zeros(size(y1)); 
+z1 = 100*ones(size(y1)); 
+path1 = plot3(x1,y1,z1,'.-','color',[0.5569 0.5098 0.9961]);
+
+% Plane 2: Red plane flies right to left: 
+y2 = fliplr(y1); 
+x2 = x1; 
+z2 = z1+50; 
+path2 = plot3(x2,y2,z2,'r.-');
+
+% Plane 3: Gray and blue plane flies 'round the mountain: 
+x3 = zeros(size(x2)); 
+x3(201:273) = -80*sind((0:15:3*360)-90)-80;
+y3 = zeros(size(x2)); 
+y3(1:175) = -250; 
+y3(176:200) = linspace(-250,0,25);
+y3(201:273) = 80*cosd((0:15:3*360)-90);
+y3(274:end) = linspace(0,250,27); 
+z3 = 120+40*cos(linspace(pi,4*pi,length(y3)))+y3/4;
+path3 = plot3(x3,y3,z3,'b.-');
+
+% Set view: 
+view([70 33])
+axis([-100 100 -100 100 0 200])
+grid off
+set(gca,'color','none')
+
+%% Example 5c: Specify roll, pitch, and yaw
+% You can specify roll, pitch and yaw in a few different ways. In the case
+% of airplane 2, which flies from right to left (in the negative y
+% direction), a constant yaw value of -180 is appropriate. 
+% 
+% We can also make up values for roll, pitch, and yaw.  Below, we add two barrel rolls
+% starting at frame 185 for the red airplane.  
+% 
+% For more complex x,y,z paths, manually defining roll, pitch, and yaw
+% can be a real exercise in bookkeeping. For those cases, we can use
+% |xyz2rpy|, which does a mediocre job of it.  Sometimes |xyz2rpy|
+% underestimates or overestimates roll, so let's exaggerate the roll for
+% plane 3 by a factor of 30: 
+
+yaw2 = -180; % because the plane is flying toward -y
+roll2 = zeros(size(y2)); 
+roll2(185:210) = linspace(0,2*360,26); 
+
+[roll3,pitch3,yaw3] = xyz2rpy(x3,y3,z3,30); 
+
+%% Example 5d: Lights, camera
+% Now let's delete those flight paths and ready the camera. We'll also
+% specify azimuth and elevation vectors for the camera. 
+
+%  delete([path1 path2 path3])
+%  az = linspace(70,85,frames); 
+%  el = linspace(33,29,frames); 
+
+%% Example 5e: Animate 
+% Now it's time to loop the animation.
+% 
+%  for k = 1:frames
+%      
+%      % draw periwinkle plane: 
+%      h1 = c130(x1(k),y1(k),z1(k),...
+%          'color',[0.5569 0.5098 0.9961]); 
+%      
+%      % draw red plane: 
+%      h2 = c130(x2(k),y2(k),z2(k),...
+%          'roll',roll2(k),...
+%          'yaw',yaw2,...
+%          'color','red'); 
+%      
+%      % draw fancy plane: 
+%      h3 = c130(x3(k),y3(k),z3(k),...
+%          'lines','none',...
+%          'wings','b',...
+%          'tail','r',...
+%          'roll',roll3(k),...
+%          'pitch',pitch3(k),...
+%          'yaw',yaw3(k));
+%  
+%      % set view and take a picture:
+%      view([az(k) el(k)])
+%      axis([-100 100 -100 100 0 200])
+%      drawnow
+%      
+%      % delete the planes we just drew: 
+%      delete([h1 h2 h3]); 
+%  end
+
+%% 
+% Using <http://www.mathworks.com/help/matlab/ref/videowriter-class.html
+% |videoWriter|>, the loop above produces this video: 
+% 
+% <html> 
+% <iframe id="ytplayer" type="text/html" width="640" height="480" 
+% src="http://www.youtube.com/embed/kmDCkq815M4?rel=0"
+% frameborder="0" allowfullscreen></iframe>
+% </html>
+% 
+%% 
+% 
+
+%% Author Info
+% <http://www.chadagreene.com Chad A. Greene> of the University of Texas
+% Institute for Geophysics
+% (<http://www.ig.utexas.edu/people/students/cgreene/ UTIG>) wrote |c130|,
+% |xyz2rpy|, and this documentation file on a sunny Saturday afternoon in
+% September, 2014.  
+##### SOURCE END #####
+--></body></html>
