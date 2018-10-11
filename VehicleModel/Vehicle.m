@@ -112,7 +112,7 @@ classdef Vehicle < LoggableObject
             traj = obj.getPositionalData;
             dec = obj.getDecisionData;
             if Cmnf.enableTrajectoryTracePlot
-                handles=plot3(traj(1,:),traj(2,:),traj(3,:),color);
+                handles=plot3(traj(1,:),traj(2,:),traj(3,:),'Color',color);
             end
             if Cmnf.enableTracePlot
                 %h1=plot3(traj(1,:),traj(2,:),traj(3,:),color);
