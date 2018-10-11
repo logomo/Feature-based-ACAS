@@ -658,8 +658,9 @@ classdef AvoidanceGrid<RullableObject
                 for l = linspace(obj.phiStart,obj.phiEnd,3)
                     rline = Cmnf.rot3D(0,l,k,line);
                     rrline = Cmnf.rot3D(alpha,beta,gamma,rline);
-                    r=[r,rrline];
-                    plot3(rrline(1,:)+x,rrline(2,:)+y,rrline(3,:)+z,'--k');
+                    %r=[r,rrline];
+                    handle = plot3(rrline(1,:)+x,rrline(2,:)+y,rrline(3,:)+z,'--k');
+                    r = [r,handle];
                 end
             end
             m =obj.dEnd;
@@ -671,8 +672,9 @@ classdef AvoidanceGrid<RullableObject
                     hline(:,l) =  Cmnf.rot3D(0,hstep(l),k,point);
                 end
                 rhline = Cmnf.rot3D(alpha,beta,gamma,hline);
-                r=[r,rhline];
-                plot3(rhline(1,:)+x,rhline(2,:)+y,rhline(3,:)+z,'--k');
+                %r=[r,rhline];
+                handle = plot3(rhline(1,:)+x,rhline(2,:)+y,rhline(3,:)+z,'--k');
+                r = [r,handle];
             end
             for k = linspace(obj.phiStart,obj.phiEnd,3)
                 vline = zeros(3,50);
@@ -681,8 +683,9 @@ classdef AvoidanceGrid<RullableObject
                     vline(:,l) = Cmnf.rot3D(0,k,vstep(l),point);
                 end
                 rvline = Cmnf.rot3D(alpha,beta,gamma,vline);
-                r=[r,rvline];
-                plot3(rvline(1,:)+x,rvline(2,:)+y,rvline(3,:)+z,'--k');
+                %r=[r,rvline];
+                handle = plot3(rvline(1,:)+x,rvline(2,:)+y,rvline(3,:)+z,'--k');
+                r = [r,handle];
             end
             
             hold off
