@@ -61,7 +61,7 @@ classdef MissionControl<RullableObject
         plannedColor='r';
         lastTrajectoryPlotHandles=[];
         actualTrajectoryPlotHandles=[];
-        
+        enableRasterRange = false;
         %SimulationParameters
         simulationTime=0;
         missionLog=[];
@@ -744,8 +744,7 @@ classdef MissionControl<RullableObject
         end
         
         function r=plotRasterRange(obj)
-            obj.avoidanceGrid.plotRasterRange(obj.vehicle.getActualPositionOrientation);
-            r=0;
+            r = obj.avoidanceGrid.plotRasterRange(obj.vehicle.getActualPositionOrientation);
         end
         
         function r=plotMissionStaticContent(obj)
@@ -768,8 +767,13 @@ classdef MissionControl<RullableObject
             prediction=lm.predictBuffer(obj.vehicle.getActualPositionOrientation,obj.movementBuffer);
             hold on 
             %plot predicted trajectory
-            predictHandle=plot3(prediction(1,:),prediction(2,:),prediction(3,:),obj.plannedColor);
+            predictHandle=plot3(prediction(1,:),prediction(2,:),prediction(3,:),'Color',obj.plannedColor);
             handles=[handles,predictHandle];
+            %plot raster range if necessary
+            if obj.enableRasterRange
+                rasterHandels = obj.plotRasterRange;
+                handles = [handles,rasterHandels];
+            end
             % plot moving obstacles
             movingObstaclesHandles=obj.plotMovingConstraints;
             handles=[handles,movingObstaclesHandles];
