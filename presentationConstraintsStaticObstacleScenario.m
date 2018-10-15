@@ -143,3 +143,13 @@ end
     missionControl1.plotRealvsPlanTrajectoryStatistics()
     Cmnf.exportFigure('ConstraintsPolynomialBuildingPathFollowing');
     
+%% Computation Load 
+ figure(4)
+    aat=[];
+    
+
+    aat= [aat,missionControl1.plotAndCalculateComputationTime];
+    
+    title('UAS 1')
+    aat'*100
+    Cmnf.exportFigure('BuildingAvoidanceComputationTime');

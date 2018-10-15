@@ -303,3 +303,30 @@ figure(2)
     subplot(3,1,1)
     title('Path following performance  UAV4')
     Cmnf.exportFigure('UtmCooperativeHeadOnMultipleUAV4PathFollowing');
+ 
+ %% Computaiton complexity
+ figure(7)
+    aat=[];
+    
+    subplot(4,1,1)
+    aat= [aat,missionControl1.plotAndCalculateComputationTime];
+    daspect('auto')
+    title('UAS 1')
+    
+    subplot(4,1,2)
+    aat= [aat,missionControl2.plotAndCalculateComputationTime];
+    daspect('auto')
+    title('UAS 2')
+    
+    subplot(4,1,3)
+    aat= [aat,missionControl3.plotAndCalculateComputationTime];
+    daspect('auto')
+    title('UAS 3')
+    
+    subplot(4,1,4)
+    aat= [aat,missionControl4.plotAndCalculateComputationTime];
+    daspect('auto')
+    title('UAS 4')
+    
+    mean(aat')*100
+    Cmnf.exportFigure('RuleBasedMultipleComputationTime');

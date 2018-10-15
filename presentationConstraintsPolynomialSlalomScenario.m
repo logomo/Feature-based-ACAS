@@ -155,3 +155,14 @@ end
     missionControl1.plotRealvsPlanTrajectoryStatistics()
     title('Path following performance')
     Cmnf.exportFigure('ConstraintsPolynomialSlalomPathFollowing');
+    
+%% Computation Load 
+ figure(4)
+    aat=[];
+    
+
+    aat= [aat,missionControl1.plotAndCalculateComputationTime];
+    
+    title('UAS 1')
+    aat'*100
+    Cmnf.exportFigure('SlalomComputationTime');

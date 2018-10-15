@@ -123,3 +123,21 @@ clear
     subplot(3,1,1)
     title('Path following performance UAV2')
     Cmnf.exportFigure('UtmCooperativeOvertake2xSpeedUAV2PathFollowing');
+ %% Computaiton Load
+
+    figure(5)
+    aat=[];
+    
+    subplot(2,1,1)
+    aat= [aat,missionControl1.plotAndCalculateComputationTime];
+    daspect('auto')
+    title('UAS 1')
+    
+    subplot(2,1,2)
+    aat= [aat,missionControl2.plotAndCalculateComputationTime];
+    daspect('auto')
+    title('UAS 2')
+    
+    
+    mean(aat')*100
+    Cmnf.exportFigure('RuleBasedOvertakeComputationTime');

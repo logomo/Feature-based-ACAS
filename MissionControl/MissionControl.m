@@ -64,6 +64,7 @@ classdef MissionControl<RullableObject
         enableRasterRange = false;
         %SimulationParameters
         simulationTime=0;
+        avoidanceRunDuration=[];
         missionLog=[];
     end
     
@@ -133,6 +134,7 @@ classdef MissionControl<RullableObject
         
         %% Simulation function
         function runOnce(obj,showStatFlag)
+            logStrartTime = clock;
             %Show status performance of navigation/avoidance grid for this
             %instance ?
             if(nargin==1)
@@ -312,6 +314,8 @@ classdef MissionControl<RullableObject
             else
                 obj.movementBuffer=[];
             end
+            logTimeEnd = clock;
+            obj.avoidanceRunDuration = [obj.avoidanceRunDuration, etime(logTimeEnd,logStrartTime)];            
         end
         
         function runOnceWithPlot(obj,f,showStats)
@@ -1053,6 +1057,25 @@ classdef MissionControl<RullableObject
                 obj.lastTrajectoryPlotHandles=[];
             end
         end
+        
+        function r=plotAndCalculateComputationTime(obj)
+            hold on 
+            avd = obj.avoidanceRunDuration;
+            time = 1:length(avd);
+            bound = ones(1, length(avd));
+            
+            [newX,newY]=Cmnf.preparefillData(time,bound);
+            Cmnf.fill(newX,newY,'g','-.');
+            [newX,newY]=Cmnf.preparefillData(time,avd);
+            Cmnf.fill(newX,newY,'r');
+            xlabel('Decision frame [t_{i-1},t_i]');
+            ylabel('Time [s]');
+            axis([min(time),max(time),0,1])
+            daspect([max(time)/3,1,1]);
+            hold off
+            r=[min(avd);max(avd);mean(avd);median(avd)];
+        end
+        
         %% Coordinate transformation methods
         function r=getLocalCoordiantes(obj,mat)
             posOr=obj.vehicle.getActualPositionOrientation;
