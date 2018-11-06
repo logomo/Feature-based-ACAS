@@ -20,7 +20,8 @@ classdef AvoidanceGrid<RullableObject
         linearModel     % linear model used to calculate Reach set (just reference) - Do not use in OA
         reachSet        % reach set for given vehicle model ... 3 new juicy methods to do it
         cellMap         % intersection structure for cell map
-        debug=0;        % debug flag
+        debug=0;          % debug flag
+        rasterColor='--k' % rasterColor
     end
     
     methods
@@ -709,7 +710,7 @@ classdef AvoidanceGrid<RullableObject
             for k = linspace(obj.thetaStart,obj.thetaEnd,obj.countHorizontal+1)
                 for l = linspace(obj.phiStart,obj.phiEnd,obj.countVertical+1)
                     rline = Cmnf.rot3Dvec(line,[0,l,k]);
-                    plot3(rline(1,:),rline(2,:),rline(3,:),'--k');
+                    plot3(rline(1,:),rline(2,:),rline(3,:),obj.rasterColor);
                 end
             end
 
@@ -721,7 +722,7 @@ classdef AvoidanceGrid<RullableObject
                     for l = 1:50
                         hline(:,l) = Cmnf.rot3Dvec(point,[0,hstep(l),k]);
                     end
-                    plot3(hline(1,:),hline(2,:),hline(3,:),'--k');
+                    plot3(hline(1,:),hline(2,:),hline(3,:),obj.rasterColor);
                 end
                 for k = linspace(obj.phiStart,obj.phiEnd,obj.countVertical+1)
                     vline = zeros(3,50);
@@ -729,7 +730,7 @@ classdef AvoidanceGrid<RullableObject
                     for l = 1:50
                         vline(:,l) = Cmnf.rot3Dvec(point,[0,k,vstep(l)]);
                     end
-                    plot3(vline(1,:),vline(2,:),vline(3,:),'--k');
+                    plot3(vline(1,:),vline(2,:),vline(3,:),obj.rasterColor);
                 end
             end  
             hold off
