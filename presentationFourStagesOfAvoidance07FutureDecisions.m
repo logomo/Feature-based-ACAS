@@ -44,6 +44,7 @@ plotwaypoint=[ 7.7501;-1.9419;0];
     
     % Reach set projection
     missionControl1.avoidanceGrid.recalculate();
+    %missionControl1.avoidanceGrid.plotReachSetColored2()
     
     %unreacable
     orange = [256 103 2]./256;
@@ -60,7 +61,6 @@ plotwaypoint=[ 7.7501;-1.9419;0];
     
     
     % Best Trajectory
-    missionControl1.avoidanceGrid.plotReachSetColored2()
     [bestTrajectory,waypointUnreachableFlag,collisionFlag]=missionControl1.findBestPath(missionControl1.avoidanceGrid);
     missionControl1.vehicle.forceSimulinkModel=true;
     missionControl1.vehicle.flyBuffer(bestTrajectory.collectMovements)
@@ -96,32 +96,50 @@ plotwaypoint=[ 7.7501;-1.9419;0];
     plot(2.94,-0.653, 'Marker','p','MarkerFaceColor','c','MarkerEdgeColor','m','MarkerSize',15);
     plot(4.852,-1.165, 'Marker','p','MarkerFaceColor','m','MarkerEdgeColor','m','MarkerSize',15);
     hold off
-    daspect([1,1,1])
+    
     
     % Legend
     hold on
     %Points
-    pp0 = plot(NaN,NaN,'Marker','square','MarkerFaceColor','w','MarkerEdgeColor','w','MarkerSize',15,'LineStyle','none');
+    pp0 = plot(NaN,NaN,'Marker','none','MarkerFaceColor','w','MarkerEdgeColor','w','MarkerSize',15,'LineStyle','none');
     pp1 = plot(NaN,NaN,'Marker','square','MarkerFaceColor','g','MarkerEdgeColor','r','MarkerSize',15,'LineStyle','none');
     pp2 = plot(NaN,NaN,'Marker','square','MarkerFaceColor','b','MarkerEdgeColor','r','MarkerSize',15,'LineStyle','none');
     pp3 = plot(NaN,NaN,'Marker','p','MarkerFaceColor','c','MarkerEdgeColor','m','MarkerSize',15,'LineStyle','none');
     pp4 = plot(NaN,NaN,'Marker','p','MarkerFaceColor','m','MarkerEdgeColor','m','MarkerSize',15,'LineStyle','none');
     %Cells
-    cc0 = plot(NaN,NaN,'Marker','square','MarkerFaceColor','w','MarkerEdgeColor','w','MarkerSize',15,'LineStyle','none');
+    cc0 = plot(NaN,NaN,'Marker','none','MarkerFaceColor','w','MarkerEdgeColor','w','MarkerSize',15,'LineStyle','none');
     cc1 = plot(NaN,NaN,'Marker','square','MarkerFaceColor','w','MarkerEdgeColor','k','MarkerSize',15,'LineStyle','none');
     cc2 = plot(NaN,NaN,'Marker','square','MarkerFaceColor','r','MarkerEdgeColor','k','MarkerSize',15,'LineStyle','none');
     cc3 = plot(NaN,NaN,'Marker','square','MarkerFaceColor','y','MarkerEdgeColor','k','MarkerSize',15,'LineStyle','none');
     cc4 = plot(NaN,NaN,'Marker','square','MarkerFaceColor',orange,'MarkerEdgeColor','k','MarkerSize',15,'LineStyle','none');
     cc5 = plot(NaN,NaN,'Marker','square','MarkerFaceColor','g','MarkerEdgeColor','k','MarkerSize',15,'LineStyle','none');
     
+    tt0 = plot(NaN,NaN,'Marker','none','MarkerFaceColor','w','MarkerEdgeColor','w','MarkerSize',15,'LineStyle','none');
+    tt1 = plot(NaN,NaN,'LineStyle','-','Color','g','LineWidth',4);
+    tt2 = plot(NaN,NaN,'LineStyle','-','Color','c','LineWidth',4);
+    tt3 = plot(NaN,NaN,'LineStyle','-','Color','b','LineWidth',4);
+    
     hold off
-    h=[pp0, pp1,pp2,pp3,pp4];
+    h=[pp0, pp1,pp2,pp3,pp4,cc0,cc1,cc2,cc3,cc4,cc5,tt0,tt3,tt2];
     legend(h, 'Points of Interest:',...
                     '- Goal',...
                     '- Initial position',...
                     '- Next decision point',...
                     '- Avoidance Goal',...
               'Cell status:',...
-                    );
-                
+                    '- Free',...
+                    '- Obstacle',...
+                    '- Unknown',...
+                    '- Unreachable',...
+                    '- Reachable',...
+              'Trajectories:',...
+                    '- Planned',...
+                    '- Future');
+   
+   %Sizing
+   title('Future decisions')
+   daspect([1,1,1])
+   axis off
+   set(gcf, 'Position',[848   523   732   420])
+   Cmnf.exportFigure('AvoidanceRun-07-FutureDecisions')
     
