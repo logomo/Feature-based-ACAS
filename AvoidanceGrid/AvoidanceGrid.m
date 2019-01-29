@@ -622,6 +622,8 @@ classdef AvoidanceGrid<RullableObject
             xlabel('x [m]')
             ylabel('y [m]')
         end
+        
+        
         function plotBaseSlice(obj,lrange,hrange,vrange,isVertical,isColored,statId)
             cells = obj.getCells(lrange,hrange,vrange);
             hold on
@@ -641,6 +643,31 @@ classdef AvoidanceGrid<RullableObject
                 fill(worker(1,:),worker(2,:),colOpt)
             end
             hold off
+        end
+        
+        
+        function plotDisplayCell(obj,distnace,horizontal,vertical,colOpt)
+            obj.plotOneCell(distnace,horizontal,vertical,false,colOpt)
+        end
+        
+        function r=plotOneCell(obj,lrange,hrange,vrange,isVertical,colOpt)
+            cells = obj.getCells(lrange,hrange,vrange);
+            hold on
+            for k = 1:length(cells)
+                gObj=cells(k).getPlotData;
+                if (colOpt == 'r')
+                    obj.putObstacle(cells(k),AbstractObstacle,1);
+                end
+                worker = 0;
+                if (isVertical)
+                    worker = gObj.verticalCell;
+                else
+                    worker = gObj.horizontalCell;
+                end
+                fill(worker(1,:),worker(2,:),colOpt)
+            end
+            hold off
+            r=worker;
         end
         
         function r=plotRasterRange(obj,offsets)
@@ -771,6 +798,21 @@ classdef AvoidanceGrid<RullableObject
             xlabel('x [m]')
             ylabel('y [m]')
             zlabel('z [m]')
+        end
+        
+        % New washed in pervol blue magic
+        function plotReachSetColored2(obj, mode)
+            if nargin == 1
+                mode = StatisticType.TrimmedReach;
+            end
+            traj=obj.reachSet.collectLeafs;
+            grid on
+            for k=1:length(traj)
+                hold on
+                traj(k).plotTrajectoryStat(StatisticType.TrimmedReach);
+                %traj(k).plotTrajectoryWide('g')
+                hold off
+            end
         end
         
         %% constraints application
