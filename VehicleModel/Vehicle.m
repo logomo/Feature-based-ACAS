@@ -11,6 +11,7 @@ classdef Vehicle < LoggableObject
         radius=2.5;
         positionOrientation=[];
         actualPositionOrientation=[];
+        forceSimulinkModel=false
     end
     
     methods
@@ -30,7 +31,7 @@ classdef Vehicle < LoggableObject
             obj.movements = [obj.movements,mt];
             movementCommand = Cmnf.getMovement(mt);
             lastState = obj.state.getLastState;
-            if Cmnf.enableNonlinearVehicle
+            if Cmnf.enableNonlinearVehicle || obj.forceSimulinkModel
                 omega_alpha=movementCommand(1);
                 omega_beta=movementCommand(2);
                 omega_gamma=movementCommand(3); 
@@ -128,6 +129,16 @@ classdef Vehicle < LoggableObject
                 %    'Marker','o','MarkerFaceColor',color,'Color',color);
                 handles=[handles,h4];
             end
+        end
+        
+        function handles=plotTrajectoryWide(obj,color)
+            traj = obj.getPositionalData;
+             
+            if nargin ==1
+                color = 'c';
+            end
+            
+            handles=plot3(traj(1,:),traj(2,:),traj(3,:),'Linewidth',4,'Color',color)
         end
         function handles = plotPlaneModel(vehicle,radius,farben)
             posOr=vehicle.actualPositionOrientation;

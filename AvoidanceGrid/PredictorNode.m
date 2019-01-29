@@ -540,7 +540,13 @@ classdef PredictorNode<LoggableObject
                 sta=obj.state;
                 [m,n] = size(sta);
                 cc= sta(1:3,(n-1):n);
-                plot3(cc(1,:),cc(2,:),cc(3,:),'Color',col);
+                if (mode ~= StatisticType.TrimmedReach)
+                    plot3(cc(1,:),cc(2,:),cc(3,:),'Color',col);
+                else
+                    if obj.pReachibility == 1
+                        plot3(cc(1,:),cc(2,:),cc(3,:),'Color','g','Linewidth',2);
+                    end
+                end
                 obj.parrent.plotTrajectoryStat(mode);
             end
         end

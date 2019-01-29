@@ -10,6 +10,7 @@ classdef StatisticType<uint32
         Feasibility(5),
         GraphObstacle(6),
         RuleInvocation(7),
+        TrimmedReach(8),
     end
     
     methods(Static)
