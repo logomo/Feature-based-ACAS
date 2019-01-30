@@ -1,14 +1,15 @@
 classdef LoggableObject<handle
-    %LOGGABLEOBJECT Summary of this class goes here
-    %   Detailed explanation goes here
+    %LOGGABLEOBJECT [Abstract] Object keeping own functionality log
+    
     
     properties
-        traceLog;
+        traceLog; %string containing logged data
     end
     
     methods
         function trace(obj)
-            fprintf(obj.traceLog);
+            %Print the containment of tracelog
+            fprintf(obj.traceLog); 
         end
     end
     

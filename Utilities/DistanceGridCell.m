@@ -1,17 +1,17 @@
 classdef DistanceGridCell<handle
-    %DISTANCEGRIDCELL Summary of this class goes here
-    %   Detailed explanation goes here
+    %DISTANCEGRIDCELL Helper class containing additional cell check data
     
     properties
-        cell;
-        checkDistance;
-        realDistance;
-        isDirect;
-        isTolerated;
+        cell;           % Cell reference
+        checkDistance;  % check distance [m]
+        realDistance;   % real distance [m]
+        isDirect;       % direct intersection idicator [boolean]
+        isTolerated;    % tolerated calculation range [boolean]
     end
     
     methods
         function obj=DistanceGridCell(cell,checkDistance,realDistance,isDirect,isTolerated)
+            %Fill the structure with data
             obj.cell = cell;
             obj.checkDistance = checkDistance;
             obj.realDistance = realDistance;

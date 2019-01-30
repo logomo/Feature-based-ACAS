@@ -6,11 +6,12 @@ classdef IntersectionGridCell<handle
         cell;               %cellReference
         position;           %position of reach reference
         time;               %reach time reference
-        probability;
+        probability;        %rate of intersection [0,1]
     end
     
     methods
-        function obj=IntersectionGridCell(cell,position,time);
+        function obj=IntersectionGridCell(cell,position,time)
+            %Constructor accepting calculated data
             obj.cell = cell;
             obj.position = position;
             obj.time = time;

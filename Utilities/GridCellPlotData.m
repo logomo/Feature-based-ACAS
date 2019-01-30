@@ -1,27 +1,33 @@
 classdef GridCellPlotData<handle
-    %GRIDCELLPLOTDATA Summary of this class goes here
-    %   Detailed explanation goes here
+    %GRIDCELLPLOTDATA Edge plot data for cell [HELPER]
+    
     
     properties
-        horizontalCell;
-        verticalCell;
-        probabilities;
+        horizontalCell; %2D cell boundary for horizontal
+        verticalCell;   %2D cell boundary for vertical 
+        probabilities;  %Vector of ratings related to the cells
     end
     
     methods
         function obj=GridCellPlotData(hc,vc,prob)
+            % Create data object
+            %   hc - horizontal cell points
+            %   vc - vertical cell points
+            %   prob - rating distribution
             obj.horizontalCell=hc;
             obj.verticalCell=vc;
             obj.probabilities=prob;
         end
         
         function r=getColorVectorGS(obj,probId)
+            %Creates a color vector gray scale
             %0-black,1-white
             sca=1-obj.probabilities(probId);
             r=[sca,sca,sca];
         end
         
         function r=getcolorVectorRGB(obj,probId)
+            %Creates color vector based on rating
            if probId==6
                sca=obj.probabilities(3);
            else
