@@ -13,4 +13,6 @@ addpath([s,'\Djikstra'])
 addpath([s,'\RuleEngine'])
 addpath([s,'\UavTraficManagement'])
 addpath([s,'\External\C130'])
+addpath([s,'\Scenarios'])
+addpath([s,'\Presentation'])
 clear
