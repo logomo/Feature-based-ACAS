@@ -11,25 +11,27 @@ classdef AdversaryVehicle<AbstractAdversaryVehicle
     end
     
     methods
-        % Constructor method
-        %   pv - position vector
-        %   vv - velocity vector
-        %   ts - horizontal spread - positive radians
-        %   vs - vertical spread - positive radians
+        
         function obj=AdversaryVehicle(pv,vv,ts,ps)
+            % Constructor method
+            %   pv - position vector
+            %   vv - velocity vector
+            %   ts - horizontal spread - positive radians
+            %   vs - vertical spread - positive radians
             obj.positionVector=pv;
             obj.velocityVector=vv;
             obj.thetaSpread=ts;
             obj.phiSpread=ps;
         end
         
-        % calculate ecliplse - numeric approximation of intersection point
-        % stepSize should be same as grid size, its standard numeric
-        % approximation  guaranting uuniform distribution within given
-        % conditions
-        %   distance - distance from point of origin at time of flight
-        %   stepSize - avoidanceGrid.stepSize or lesser (performance tuning)
+        
         function r=calculateElipse(obj,distance,stepSize)
+            % calculate ecliplse - numeric approximation of intersection point
+            % stepSize should be same as grid size, its standard numeric
+            % approximation  guaranting uuniform distribution within given
+            % conditions
+            %   distance - distance from point of origin at time of flight
+            %   stepSize - avoidanceGrid.stepSize or lesser (performance tuning)
             % Generate covariant elyptical slice on  direct distance
             a=sin(obj.thetaSpread)*distance;                                %calculate horizontal spread in meters
             b=sin(obj.phiSpread)*distance;                                  %calculate vertical spread

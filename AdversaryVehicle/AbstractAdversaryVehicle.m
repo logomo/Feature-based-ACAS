@@ -1,11 +1,13 @@
 classdef AbstractAdversaryVehicle<LoggableObject
-    %ABSTRACTADVERSARYVEHICLE Abstract class for listing purposes
+    %Abstract adversary vehicle
+    %   Class for interface purposes
     
     properties
     end
     
     methods
         function registerSelf(obj,ag)
+            %the basic 
         end
     end
     

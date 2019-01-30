@@ -1,6 +1,6 @@
 classdef IntersectionConfig
-    %INTERSECTIONCONFIG Summary of this class goes here
-    %   Detailed explanation goes here
+    %INTERSECTIONCONFIG Intersection model configuration
+    %   Used for 
     
     properties
         flagTimeIntersection = false;    %Enforce time

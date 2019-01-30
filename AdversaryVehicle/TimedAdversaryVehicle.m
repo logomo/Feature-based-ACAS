@@ -1,6 +1,6 @@
 classdef TimedAdversaryVehicle<AbstractAdversaryVehicle
-    %TIMEDADVERSARYVEHICLE Summary of this class goes here
-    %   Detailed explanation goes here
+    %TIMEDADVERSARYVEHICLE Time based adversary vehicle for intruder
+    %intersection models
     
     properties
         position                % Position XYZ in avoidance grid local coordinates
@@ -24,17 +24,18 @@ classdef TimedAdversaryVehicle<AbstractAdversaryVehicle
     end
     
     methods
-        % Object contructor - initializes structures
-        %   position - vehlicle XYZ position in Avoidance grid coordinate
-        %              frame
-        %   velocity - vehicle XYZ velocity in Avoidance grid coordinate
-        %              frame
-        %   radius - vehicle body radius - if not given set to 0 [m]
-        %   distanceError - linear estimator error [m]
-        %   thetaSpread - horizontal uncertainity spread [rad]
-        %   phiSpread - vertical uncertainity spread [rad]
+        
         function obj=TimedAdversaryVehicle(position,velocity,radius,...
                                            distanceError,thetaSpread,phiSpread)
+        	% Object contructor - initializes structures
+            %   position - vehlicle XYZ position in Avoidance grid coordinate
+            %              frame
+            %   velocity - vehicle XYZ velocity in Avoidance grid coordinate
+            %              frame
+            %   radius - vehicle body radius - if not given set to 0 [m]
+            %   distanceError - linear estimator error [m]
+            %   thetaSpread - horizontal uncertainity spread [rad]
+            %   phiSpread - vertical uncertainity spread [rad]
             obj.position=position;
             obj.velocity=velocity;
             if nargin > 2
@@ -60,11 +61,12 @@ classdef TimedAdversaryVehicle<AbstractAdversaryVehicle
             obj.flagBallIntersection = obj.radius ~=0;                      %If there is no radius just no ball spread ...
         end
         
-        % Findst intersections based on flags in given avoidance grid
-        %   ag - avoidance grid object
-        %   r - count of hitted intersections
-        %   DISCLAIMER - function does not modify AVOIDANCE GRID
+        
         function r=findIntersection(obj,ag)
+            % Findst intersections based on flags in given avoidance grid
+            %   ag - avoidance grid object
+            %   r - count of hitted intersections
+            %   DISCLAIMER - function does not modify AVOIDANCE GRID
             r=0;
             if ~obj.flagCalculated                                          %Test calculation 
                 rf=obj.findDirectIntersectionCells(ag);                     % find direct intersection - no time constraint - mandatory step
@@ -89,19 +91,21 @@ classdef TimedAdversaryVehicle<AbstractAdversaryVehicle
             end
         end
         
-        % Find direct intersection in avoidance grid 
-        %   ag - avoidance grid object
-        %   r - list of intersection cells with intersection time
+        
         function r=findDirectIntersectionCells(obj,ag)                       
+            % Find direct intersection in avoidance grid 
+            %   ag - avoidance grid object
+            %   r - list of intersection cells with intersection time
             r=ag.getLineIntersectionNumeric(obj.position,obj.velocity);
             obj.intersectionCells = r;
         end
         
-        % Finds movement intersection in time and future intersections
-        %   timeMovementCells - list of cells within boundary
-        %   futureMovementCells - list of cells after intersection
+        
         function [timeMovementCells,futureMovementCells]=...
                                         findTimeIntersectionCells(obj)
+            % Finds movement intersection in time and future intersections
+            %   timeMovementCells - list of cells within boundary
+            %   futureMovementCells - list of cells after intersection
             adversaryLinearVelocity=norm(obj.velocity,2);                   %Normalize velocity og linear model
             adversaryTimeError=obj.distanceError;                               %set time error of predictor
             cells=obj.intersectionCells;
@@ -142,10 +146,11 @@ classdef TimedAdversaryVehicle<AbstractAdversaryVehicle
             obj.futureMovementCells=futureMovementCells;
         end
         
-        % Find intersection Balls in direct intersection cells
-        %   ag - avoidance grid object 
-        %   r - list of IntersectionGridBall objects
+        
         function r=findIntersectionBalls(obj,ag)                    
+            % Find intersection Balls in direct intersection cells
+            %   ag - avoidance grid object 
+            %   r - list of IntersectionGridBall objects
             obj.ballRadiusCells = [];
             for wCell = obj.timeMovementCells
                 candidates = Cmnf.findCellsInRange(ag,wCell.cell,...
@@ -182,6 +187,8 @@ classdef TimedAdversaryVehicle<AbstractAdversaryVehicle
         end
         
         function r=findIntersectionEllipseCells(obj,ag)
+            % Find intersection with avoidance grid for spreac intruder
+            % intersection
             intersections=[];
             flagEnter=0;
             flagLeave=0;
@@ -207,6 +214,8 @@ classdef TimedAdversaryVehicle<AbstractAdversaryVehicle
         end
         
         function r=generateIntersectionEllipse(obj,distance,stepSize) 
+            % Generates intersection ellipsoid slice for spread
+            % intersection based on slice distance and point step size
             position = obj.position;
             velocity=  obj.velocity;
             thetaSpread=obj.thetaSpread;
