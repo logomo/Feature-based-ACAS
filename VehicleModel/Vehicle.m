@@ -1,21 +1,22 @@
 classdef Vehicle < LoggableObject
-    %VEHICLE Summary of this class goes here
-    %   Detailed explanation goes here
+    %VEHICLE UAS implementaiton class
     
     properties        
-        linearModel;        
-        state;
-        decisions;
-        movements;
-        position;
-        radius=2.5;
-        positionOrientation=[];
-        actualPositionOrientation=[];
-        forceSimulinkModel=false
+        linearModel;                    %UAS Linearized model reference     
+        state;                          %State evolution
+        decisions;                      %Decision points in form of State snapshots
+        movements;                      %Executed movements trace
+        position;                       %actual position
+        radius=2.5;                     %[HELPER] radius for intersection models - usually overriden to 0.6 m
+        positionOrientation=[];         %Actual position and orientaiton extracted from STATE LCF
+        actualPositionOrientation=[];   %Actual position and orientaiton extracted from STATE GCF
+        forceSimulinkModel=false        %[HELPER]Indication if Simulink model or movement automaton should be forced
     end
     
     methods
         function obj = Vehicle(s)
+            % Create UAS,
+            %   s - state object with initial state at time 0.
             if (nargin ~=0)
                 Cmnf.logc(obj,'Loading state')
                 obj.state =s;
@@ -28,6 +29,8 @@ classdef Vehicle < LoggableObject
         end
         
         function r=fly(obj,mt)
+            %Fly one movement
+            %   mt - movement type from enumeration
             obj.movements = [obj.movements,mt];
             movementCommand = Cmnf.getMovement(mt);
             lastState = obj.state.getLastState;
@@ -62,13 +65,15 @@ classdef Vehicle < LoggableObject
         end
         
         function r=flyBuffer(obj,buffer)
+            %Fly multiple movements 
+            %   buffer - series of Movement Types to be applied
             for k=1:length(buffer)
                 r=obj.fly(buffer(k));
             end
         end
            
         function new = copy(this)
-            % Instantiate new object of the same class.
+            % Instantiate new object of the same class and copies data
             new = feval(class(this));
     
             % Copy all non-hidden properties.
@@ -78,11 +83,13 @@ classdef Vehicle < LoggableObject
         end
         
         function r=getPositionalData(obj)
+            %Gets XYZ GCF position
             s = obj.state;
             r = [s.x_pos;s.y_pos;s.z_pos;];
         end
         
         function r=setActualPositionOrientation(obj)
+            %[HELPER][Internal]Sets Position(1:3) and Orientation(4:6) in GCF for actual time-frame
             x=obj.state.x_pos;
             i=length(x);
             vehicleState = obj.state.getLastState();
@@ -99,14 +106,17 @@ classdef Vehicle < LoggableObject
         end
         
         function r=getActualPositionOrientation(obj)
+            %Gets Position(1:3) and Orientation(4:6) in GCF for actual time-frame
             r=obj.actualPositionOrientation;
         end
         
         function r=getDecisionData(obj)
+            %Gets decision points in form of column list of states
             r = [obj.decisions(1,:);obj.decisions(2,:);obj.decisions(3,:)];
         end
         
         function handles=plotTrajectory(obj,color)
+            %Plots trajectory flew by UAS
             if nargin <=1
                 color='b';
             end
@@ -132,6 +142,7 @@ classdef Vehicle < LoggableObject
         end
         
         function handles=plotTrajectoryWide(obj,color)
+            %[Helper] plots wide trajectory flew by UAS
             traj = obj.getPositionalData;
              
             if nargin ==1
@@ -140,7 +151,9 @@ classdef Vehicle < LoggableObject
             
             handles=plot3(traj(1,:),traj(2,:),traj(3,:),'Linewidth',4,'Color',color)
         end
+        
         function handles = plotPlaneModel(vehicle,radius,farben)
+            %Plots plane model on actual position/orientation in GFC
             posOr=vehicle.actualPositionOrientation;
             position=posOr(1:3);
             orientation=rad2deg(posOr(4:6));

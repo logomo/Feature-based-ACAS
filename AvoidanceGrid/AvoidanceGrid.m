@@ -1,5 +1,5 @@
 classdef AvoidanceGrid<RullableObject
-    %AVOIDANCEGRID Probabilistic implementation of infamous avoidance grid
+    %AVOIDANCEGRID Probabilistic implementation of avoidance grid
     %   Contains reachibility and probability calculation and data fusion
     
     properties
@@ -25,18 +25,18 @@ classdef AvoidanceGrid<RullableObject
     end
     
     methods
-        % Constructor function
-        %   ds - distanceStart [m] - 0 please keep it 0
-        %   de - distanceEnd [m]
-        %   ts - horizontal angle start [rad]
-        %   te - horizontal angle end [rad]
-        %   ps - vertical angle start [rad]
-        %   pe - vertical angle end [rad]
-        %   lc - layer count [positive integer] - must match unit distance
-        %        of movement automaton
-        %   hc - horizontal cell count [positive integer]
-        %   vc - vertical cell count [positive integer]
         function obj=AvoidanceGrid(ds,de,ts,te,ps,pe,lc,hc,vc)
+            % Constructor function
+            %   ds - distanceStart [m] - 0 please keep it 0
+            %   de - distanceEnd [m]
+            %   ts - horizontal angle start [rad]
+            %   te - horizontal angle end [rad]
+            %   ps - vertical angle start [rad]
+            %   pe - vertical angle end [rad]
+            %   lc - layer count [positive integer] - must match unit distance
+            %        of movement automaton
+            %   hc - horizontal cell count [positive integer]
+            %   vc - vertical cell count [positive integer]
             Cmnf.logc(obj,'Creating avoidance Grid')
             obj.dStart=ds;
             obj.dEnd=de;
@@ -74,8 +74,9 @@ classdef AvoidanceGrid<RullableObject
             obj.calculateToleratedDistanceDeviation;                        % calculate layer distance deviations (it copies distance deviations to cells)
         end
         
-        %Reset function
+        
         function resetGrid(obj)
+            %Reset internal datastructure 
             obj.reachSet.resetParameters;
             obj.adversarials=[];
             for k=1:length(obj.layers)
@@ -85,6 +86,7 @@ classdef AvoidanceGrid<RullableObject
 
         %Linker function
         function linkIt(obj)
+            % Links internal datastructures
             for k=1:obj.countLayers
                 obj.layers(k).layerIndex = k;
                 obj.layers(k).parrentGrid = obj;
@@ -93,6 +95,7 @@ classdef AvoidanceGrid<RullableObject
         end
         %cellMapCalculation function [center,ijkMap]
         function calculateCellMap(obj)
+            % [HELPER] creates cell map for faster crawler 
             cellMap=[];                                                     
             for k= 1:length(obj.layers)
                 for l=1:obj.layers(k).horizontalCellCount
@@ -107,17 +110,18 @@ classdef AvoidanceGrid<RullableObject
             obj.cellMap=cellMap;
         end
         function r=calculateToleratedDistanceDeviation(obj)
+            % [Helper] intersection model
             r = zeros(1,obj.countLayers);
             for k = 1:obj.countLayers
                 r(k)= obj.layers(k).calculateToleratedDistanceDeviation;
             end
         end
         %% Getter functions
-        % Get cells defined by ranges
-        %   lrange - layer range [ordered set of positive integers]
-        %   hrange - horizontal range [ordered set of positive integers]
-        %   vrange - vertical range [ordered set of positive integers]
         function r=getCells(obj,lrange,hrange,vrange)
+            % Get cells defined by ranges
+            %   lrange - layer range [ordered set of positive integers]
+            %   hrange - horizontal range [ordered set of positive integers]
+            %   vrange - vertical range [ordered set of positive integers]
             count = length(lrange)*length(hrange)*length(vrange);
             iter = 1;
             r(count) = GridCell();
@@ -131,9 +135,10 @@ classdef AvoidanceGrid<RullableObject
             end
         end
         
-        % Get cells defined by list, with advanced sanity check
-        %   list - column list of cell coordinates
+        
         function r=getCellsListedSanity(obj,list)
+            % Get cells defined by list, with advanced sanity check
+            %   list - column list of cell coordinates
             [m,n] = size(list);
             if m ~=3
                 r=[];
@@ -153,16 +158,19 @@ classdef AvoidanceGrid<RullableObject
             end
             r=candidates;
         end
-        % Get cell defined by euclidian position in LCF (Local coordinate frame)
-        %   position - [x,y,z] position in LCF
+        
+        
         function r=getCellEuclidian(obj,position)
+            % Get cell defined by euclidian position in LCF (Local coordinate frame)
+            %   position - [x,y,z] position in LCF
             pl = Cmnf.euc2plan(position(1),position(2),position(3));
             r = obj.getCellPlanar(pl);
         end
         
-        % Get cell by planar coordinates - LLCMF
-        %   position - [distance, theta,varhhi] - Cmnf gives apro. transf.
+        
         function r=getCellPlanar(obj,position)
+            % Get cell by planar coordinates - LLCMF
+            %   position - [distance, theta,varhhi] - Cmnf gives apro. transf.
             distance =position(1);
             theta = position(2);
             phi = position(3);
@@ -188,11 +196,12 @@ classdef AvoidanceGrid<RullableObject
             end
         end
         
-        % Holistic approach to get line vs Grid intersection, does not 
-        % work very well ig cell count >> 800
-        %   point - point of mass inside of grid 
-        %   velocity - velocity 
+        
         function r=getLineIntersection(obj,point,velocity)
+            % Holistic approach to get line vs Grid intersection, does not 
+            % work very well if cell count >> 800
+            %   point - point of mass inside of grid 
+            %   velocity - velocity 
             if length(obj.cellMap) == 0
                 obj.calculateCellMap;
             end
@@ -232,12 +241,13 @@ classdef AvoidanceGrid<RullableObject
             r=ccs;
         end
         
-        % Numeric approach for line intersection work well with greater
-        % grids but its not stable as holistic approach
-        %   adversaryPoint - Adversary point at time 0
-        %   adversaryVelocity - Adversary velocity vector
+        
         function r=getLineIntersectionNumeric(obj,adversaryPoint,...
                                                   adversaryVelocity)
+            % Numeric approach for line intersection work well with greater
+            % grids but its not stable as holistic approach
+            %   adversaryPoint - Adversary point at time 0
+            %   adversaryVelocity - Adversary velocity vector
             maximumGridRange= 2*(obj.dEnd -obj.dStart);
             maximumTime = maximumGridRange/norm(adversaryVelocity,2);
             stepTime = obj.stepLayer/norm(adversaryVelocity,2);
@@ -311,9 +321,9 @@ classdef AvoidanceGrid<RullableObject
             r=cells;
         end
         %% Adversarial behaviour
-        % Adds adversarial objects created in AdversaryVehicle class
-        %   adverarial - valid adversarial
         function r=putAdversarial(obj,adversarial)
+            % Adds adversarial objects created in AdversaryVehicle class
+            %   adverarial - valid adversarial
             obj.adversarials= [obj.adversarials,adversarial];               % register adversarial for this runtime
             points = [];                                                    % interection points
             hits = 0;                                                       % count of one elipsoindal hits to grid range
@@ -342,8 +352,10 @@ classdef AvoidanceGrid<RullableObject
             end
             r=points;
         end
-        %
+        
         function r=putTimedAdversarial(obj,adversarial)
+            % Puts timed adversarial into avoidance grid
+            %   adversarial - TimedAdversaryBody class
             obj.adversarials= [obj.adversarials,adversarial];
             points=[];
             adversarial.findIntersection(obj);
@@ -430,6 +442,11 @@ classdef AvoidanceGrid<RullableObject
         
         %% Static obstacles
         function r=putObstacle(obj,cell,obstacle,probability)
+            % Puts static obstacle into avoidance grid
+            %   cell - target cell
+            %   obstacle - static obstacle object from class AbstractObstacle
+            %   probability - the intersection rate [0,1]
+            
             %if its detected obstacle
             if obstacle.type==ObstacleType.Detected
                 %get frontal cells
@@ -454,10 +471,10 @@ classdef AvoidanceGrid<RullableObject
             r=0;
         end
         %% Reachable set functions
-        % Recreate associations NODE<-> cell after pruning or after reach
-        % set change ...
-        %   root - new reach set base implemented as PredictorNode class
+        
         function r=recreateAssociations(obj,root)
+            % Recreate associations NODE<-> cell after pruning or after reach set change ...
+            %   root - new reach set base implemented as PredictorNode class
             for i=1:length(obj.layers)                                      %Just clean old references 
                 wLayer=obj.layers(i);
                 for k=1:wLayer.horizontalCellCount*wLayer.verticalCellCount
@@ -474,9 +491,9 @@ classdef AvoidanceGrid<RullableObject
                 obj.layers(i).calculateArrivalTime;
             end
         end
-        % Sanity check function, returns count of assiociated nodes in
-        % Avoidance grid, it should be same as reachibility Set - 1 (root)
+        
         function r=countAssociations(obj)
+            % Sanity check function, returns count of assiociated nodes in Avoidance grid, it should be same as reachibility Set - 1 (root)
             r=0;
             for i=1:length(obj.layers)
                 wLayer=obj.layers(i);
@@ -488,9 +505,10 @@ classdef AvoidanceGrid<RullableObject
             end
         end
         
-        %
-        %testPredictionInGridSmartSplit03Best 
         function precalculateHarmonicReachSet(obj,lm)
+            % Create turn-minimizing reach set approximation
+            %   lm - LinearizedModel used by movement automaton 
+            
             obj.linearModel = lm;
             %root build up
             root=PredictorNode([0;0;0;0;0;0;0],0,0); %zero state, zero orientation
@@ -511,6 +529,11 @@ classdef AvoidanceGrid<RullableObject
         
         % testPredictorInGridLayerBased02 farcount = 8, nearcount =1
         function precalculateCellSpreadReachSet(obj,lm,farCount,nearCount)
+            %Create coverage-maximizing reach set approximation
+            %   lm - linearized model
+            %   farcount - (chaotic movement count) - tuning parameter
+            %   nearCount - (harmonic movement count) - tuning parameter
+
             obj.linearModel=lm;
             %root build up
             root=PredictorNode([0;0;0;0;0;0;0],0,0); %zero state, zero movement
@@ -531,6 +554,8 @@ classdef AvoidanceGrid<RullableObject
         
         %test 01
         function precalculateLimitedPassingReachSet(obj,lm,passRatio)
+            %[DEPRECATED] Harmonic Reach Set Approximation limited passing
+            %   passRatio - (movementCount) - tuning parameter
             obj.linearModel=lm;
             trajectoryRegister = containers.Map;
             %root build up
@@ -558,6 +583,9 @@ classdef AvoidanceGrid<RullableObject
         %   testPredictorGridAcasReachSet.m
         %   testPredictorGridAcasReachSetFunction.m
         function precalculateACASReachSet(obj,lm,separations)
+            %Create ACAS like Reach Set approximation
+            %   lm - LinearizedModel instance
+            %   separation - set of ACASSeparations enumerables
             obj.linearModel=lm;
             
             %root build up
@@ -591,6 +619,7 @@ classdef AvoidanceGrid<RullableObject
         
         %% Global probability calculation
         function r=recalculate(obj)
+            %Recalculate ratings on cells/reach set trajectories
             r=0;
             for i=1:obj.countLayers
                 wLayer = obj.layers(i);
@@ -608,6 +637,7 @@ classdef AvoidanceGrid<RullableObject
         end
         
         function reclalculateReachibility(obj)
+            %Recalculate reachiblity on cells/trajectories
             for i=1:length(obj.layers)
                 wLayer=obj.layers(i);
                 for k=1:wLayer.horizontalCellCount*wLayer.verticalCellCount
@@ -617,6 +647,9 @@ classdef AvoidanceGrid<RullableObject
         end
         %% Plot functions
         function plotHorizontalSlice(obj,verticalIndex,statId)
+            % Plot status of horizontal slice of the avoidance grid
+            %   verticalInxed - the vertical layer index
+            %   statId - StatisticType enumerable
             hc=obj.countHorizontal;
             obj.plotBaseSlice(1:obj.countLayers,1:hc,obj.countVertical-verticalIndex+1,0,1,statId)
             xlabel('x [m]')
@@ -625,6 +658,13 @@ classdef AvoidanceGrid<RullableObject
         
         
         function plotBaseSlice(obj,lrange,hrange,vrange,isVertical,isColored,statId)
+            %Plot base slice of grid, depending on parameters
+            %   lrange - range of distance layers
+            %	hrange - range of horizontal layers XOR
+            %	vrange - range of vertical layers
+            %	isVertical - false - horizontal slice/true - vertical slice
+            %	isColored  - false - BW mode, true - RGB mode 
+            %	statId - statistic type enumerate member
             cells = obj.getCells(lrange,hrange,vrange);
             hold on
             for k = 1:length(cells)
@@ -647,10 +687,12 @@ classdef AvoidanceGrid<RullableObject
         
         
         function plotDisplayCell(obj,distnace,horizontal,vertical,colOpt)
+            % [Helper] plots cell 
             obj.plotOneCell(distnace,horizontal,vertical,false,colOpt)
         end
         
         function r=plotOneCell(obj,lrange,hrange,vrange,isVertical,colOpt)
+            % [Helper] plots one cell
             cells = obj.getCells(lrange,hrange,vrange);
             hold on
             for k = 1:length(cells)
@@ -671,6 +713,8 @@ classdef AvoidanceGrid<RullableObject
         end
         
         function r=plotRasterRange(obj,offsets)
+            %Plots raster range in 3D enviroment
+            %   offsets - position/orientation in GCF (UAS)
             r=[];
             hold on
             x=offsets(1);
@@ -720,6 +764,11 @@ classdef AvoidanceGrid<RullableObject
         end
         
         function r=plotRaster(obj,fig,sx,sy,p)
+            %[HELPER] plots raster range for reach set aprox
+            %   fig - figure graphic ID
+            %   sx - subplot x
+            %   sy - subplot y
+            %   p  - subplot ID
             if nargin == 0
                 figure(1);
             end
@@ -764,6 +813,7 @@ classdef AvoidanceGrid<RullableObject
             r=0;
         end
         function plotReachSet(obj)
+            %Plots all trajectories in reach set approximation
             root=obj.reachSet;
             nodesCount=root.countNodes(0);
             routeCount=root.countNodes(1);
@@ -783,6 +833,8 @@ classdef AvoidanceGrid<RullableObject
         end
         
         function plotReachSetColored(obj, mode)
+            %plots reach set for [0,0,0,0,0,0] position/orientation
+            %   mode - statistic type to be plotted (def Reachibility)
             if nargin == 1
                 mode = StatisticType.Reachability;
             end
@@ -802,6 +854,7 @@ classdef AvoidanceGrid<RullableObject
         
         % New washed in pervol blue magic
         function plotReachSetColored2(obj, mode)
+            %[Helper] To plot trimmed Reach set
             if nargin == 1
                 mode = StatisticType.TrimmedReach;
             end
@@ -809,7 +862,7 @@ classdef AvoidanceGrid<RullableObject
             grid on
             for k=1:length(traj)
                 hold on
-                traj(k).plotTrajectoryStat(StatisticType.TrimmedReach);
+                traj(k).plotTrajectoryStat(mode);
                 %traj(k).plotTrajectoryWide('g')
                 hold off
             end
@@ -817,6 +870,9 @@ classdef AvoidanceGrid<RullableObject
         
         %% constraints application
         function r=applyHardConstraint(obj,mc,cc)
+            %Apply hard constraints on avoidance grid
+            %   mc - mission control object
+            %   cc - constraint object
             obj.reachSet.applyHardConstraint(mc,cc);
             r=obj.reachSet.applyOperatibleSpace();
             obj.recalculate();
@@ -824,6 +880,7 @@ classdef AvoidanceGrid<RullableObject
         
         %% Rule engine create context (DO NOT CALL DIRECTLY)
         function r=createContextRuleEngine(obj)
+            % [Overide] rule engine initializatiion by data from avoidance grid
             createContextRuleEngine@RullableObject(obj);
             obj.reContext('grid')=obj;
             r=obj.reContext;
@@ -831,8 +888,8 @@ classdef AvoidanceGrid<RullableObject
         
         %% Rule engine injection method
         function r=injectRuleEngine(obj,ruleEngine)
+            % [Override] rule engine intejtion for avoidance grid
             masterFlag=injectRuleEngine@RullableObject(obj,ruleEngine);
-            % TODO injection body
             r=masterFlag;
         end
     end
