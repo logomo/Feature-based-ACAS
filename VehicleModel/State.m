@@ -3,26 +3,27 @@ classdef State < LoggableObject
     %   Detailed explanation goes here
     
     properties
-        figure_angles = 1;
-        figure_position = 2;
-        x_pos = [];
-        y_pos = [];
-        z_pos = [];
-        x_der = [];
-        y_der = [];
-        z_der = [];
-        alpha = [];
-        beta = [];
-        gamma = [];
-        omega_alpha = [];
-        omega_beta = [];
-        omega_gamma = [];
-        velocity = [];
-        time = [];
+        figure_angles = 1;      % orientation figure id
+        figure_position = 2;    % position evoulution figure id
+        x_pos = [];             % X-position GCF
+        y_pos = [];             % Y-position GCF
+        z_pos = [];             % Z-position GCF
+        x_der = [];             % dx/dt GFC
+        y_der = [];             % dy/dt GFC
+        z_der = [];             % dz/dt GFC
+        alpha = [];             % Roll [rad]
+        beta = [];              % Pitch [rad]
+        gamma = [];             % Yaw [rad]
+        omega_alpha = [];       % dRoll/dt [rad/s]
+        omega_beta = [];        % dPitch/dt [rad/s]
+        omega_gamma = [];       % dYaw/dt [rad/s]
+        velocity = [];          % velocity [m/s]
+        time = [];              % global simulaiton time [s]
     end
     
     methods
         function obj = State(omega_alpha_0,omega_beta_0,omega_gamma_0,x_0,y_0,z_0, velocity)
+            % State initializaiton with parameters - refer to param section
             if (nargin ~=0)
                 obj.x_pos = [x_0];
                 obj.y_pos = [y_0];
@@ -52,6 +53,7 @@ classdef State < LoggableObject
         
         
         function r = append(obj,inputState)
+            %Append the state by inputState
             inputState= inputState';
             obj.velocity = [obj.velocity,inputState(1,:)];
             obj.x_der = [obj.x_der, inputState(2,:)];
@@ -73,6 +75,7 @@ classdef State < LoggableObject
         end
         
         function r = appendLinearModel(obj,state)
+            %Append by predictor state contains only position orientation and time
             obj.x_pos = [obj.x_pos state(1)];
             obj.y_pos = [obj.y_pos state(2)];
             obj.z_pos = [obj.z_pos state(3)];
@@ -91,6 +94,7 @@ classdef State < LoggableObject
         end
         
         function r=plot(obj)
+            %Plot figures for position/orientaiton evolution over time
             figure(obj.figure_angles);
             subplot(3,2,1);
             hold on
@@ -204,6 +208,7 @@ classdef State < LoggableObject
         end
         
         function r = getLastState(obj)
+            %Get last state as vector
             p=length(obj.x_pos);
             r = [obj.x_pos(p);
                  obj.y_pos(p);
@@ -221,6 +226,7 @@ classdef State < LoggableObject
                  obj.time(p)];
         end
         function r = getLastStatePredictor(obj)
+            %Get last state for predictor
             p=length(obj.x_pos);
             r = [obj.x_pos(p);
                  obj.y_pos(p);

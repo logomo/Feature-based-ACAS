@@ -1,19 +1,24 @@
 classdef LinearizedModel
-    %LINEARIZEDMODEL Summary of this class goes here
-    %   Detailed explanation goes here
+    %LINEARIZEDMODEL Movement automaton (6.3.2) linearized model
+    
     
     properties
-      table
-      stepTime=1;
+      table             %movement table
+      stepTime=1;       %base step time (1s)
     end
     
     methods
         function obj=LinearizedModel()
+            %Constructor, load the linearized model states
             a=load('LinearModelData.mat','linearizedStates');
             obj.table = a.linearizedStates;
         end
         
         function state=predict(obj,initState,mt)
+            %Predict the future state:
+            %   initState - initialstate
+            %   mt - applied movement from enumerate
+            %   out:state - state after movement application
             movement = obj.table(:,mt+1);
             [m,n]=size(initState);
             s_x = initState(1,n);
@@ -43,6 +48,10 @@ classdef LinearizedModel
         end
         
         function state=predictBuffer(obj,initState,buffer)
+            %Predict the future state:
+            %   initState - initialstate
+            %   buffer - applied movements from enumerate
+            %   out:state - state after movements application
             state = initState;
             for k=1:length(buffer)
                 state=obj.predict(state,buffer(k));
@@ -50,11 +59,16 @@ classdef LinearizedModel
         end
         
         function r=getVelocity(obj)
+            %average velocity of the movement
             movement = obj.table(:,1);
             r=movement(1);
         end
         
         function state=flyLinearized(obj,previousState,mt)
+            %Apply one movement on linerized model:
+            %   previousState - initialstate
+            %   mt - applied movement from enumerate
+            %   out:state - state after movement application
             p_x_pos = previousState(1);
             p_y_pos = previousState(2);
             p_z_pos = previousState(3);
