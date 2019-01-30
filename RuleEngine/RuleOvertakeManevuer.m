@@ -1,24 +1,25 @@
 classdef RuleOvertakeManevuer<AbstractRule
-    %TESTRULE Summary of this class goes here
-    %   Detailed explanation goes here
+    %RuleOvertakeManevuer Rule to enforce overtake manuever
+    
     
     properties
-       vehicleId,
-       collisionCase,
-       collisionPoint,
-       missionControl,
-       avoidanceGrid,
-       velocity,
-       reachSet,
-       position,
-       orientation,
-       collisionCategory,
-       avoidanceRole,
-       safetyMargin,
+       vehicleId,           %UAS UQ ID
+       collisionCase,       %Related collision case reference
+       collisionPoint,      %3D GCF collision point
+       missionControl,      %Mission control UAS reference
+       avoidanceGrid,       %UAS active grid reference
+       velocity,            %UAS actual velocity
+       reachSet,            %UAS active reach set approximation
+       position,            %UAS actual position
+       orientation,         %UAS actual orientaiton
+       collisionCategory,   %Collision case category
+       avoidanceRole,       %ROW type
+       safetyMargin,        %Enforced minimal avoidance distance
     end
     
     methods
         function obj = RuleOvertakeManevuer(context,jointPointCode,ruleCode)
+            %Initialize rule based on context
             obj = obj@AbstractRule(context,jointPointCode,ruleCode);
             %additional init function ality here
             % START
@@ -26,6 +27,7 @@ classdef RuleOvertakeManevuer<AbstractRule
         end
 
         function r=parseContext(obj)
+            %[Override] Context parser implementaiton
             priorFlag=parseContext@AbstractRule(obj);
             % Additional parse context functionality here
             % START
@@ -47,6 +49,7 @@ classdef RuleOvertakeManevuer<AbstractRule
         end
         
         function r=testCondition(obj)
+            %[Override] context parsing sanity check
             priorFlag=testCondition@AbstractRule(obj);
             % Additional condition statements
             % START
@@ -56,6 +59,7 @@ classdef RuleOvertakeManevuer<AbstractRule
         end
         
         function r=invokeRuleBody(obj)
+            %[Override] rule body invocation - waypoint enforcement
             priorFlag=invokeRuleBody@AbstractRule(obj);
             % Additional invokations (yes we are summoning the rule :D)
             % START

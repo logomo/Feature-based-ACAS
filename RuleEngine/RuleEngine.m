@@ -1,9 +1,9 @@
 classdef RuleEngine<LoggableObject
-    %RULEENGINE Summary of this class goes here
-    %   Detailed explanation goes here
+    %RULEENGINE Basic obstacle avoidance framework enhancement
+    %   Mission control behavioral pattern implementation
     
     properties
-        ruleList;
+        ruleList;   %list of active rules
     end
     
     methods
@@ -16,6 +16,9 @@ classdef RuleEngine<LoggableObject
         end
         %% Activate Rule in Rule engine
         function r=activateRule(obj,jointPointCode,ruleCode)
+           %Activate rule on given jointpoint
+           %    jointPointCode - enumeration member
+           %    ruleCode - enumeration member
            jpsc=RuleJointPoint.toString(jointPointCode);
            rsc=RuleCode.toString(ruleCode);
            
@@ -32,6 +35,9 @@ classdef RuleEngine<LoggableObject
         end
         %% activate rules
         function r=activateRules(obj,jointPointCode,ruleCodes)
+            %Activates multiple rules on jointpoint
+            %   jointPointCode - enumerate member
+            %   ruleCodes - list of rule type enumeration members
             for ruleCode=ruleCodes
                 obj.activateRule(jointPointCode,ruleCode);
             end
@@ -39,6 +45,9 @@ classdef RuleEngine<LoggableObject
         end
         %% deactivate rule
         function r=deactiveRule(obj,jointPointCode,ruleCode)
+           %Deactivates one rule  
+           %    jointPointCode - enumeration member
+           %    ruleCode - enumeration member
            jpsc=RuleJointPoint.toString(jointPointCode);
            rsc=RuleCode.toString(ruleCode);
            if obj.ruleList.isKey(jpsc)
@@ -54,6 +63,9 @@ classdef RuleEngine<LoggableObject
         
         %% deactivate rules
         function r=deactivateRules(obj,jointPointCode,ruleCodes)
+            %Deactivates multiple rules on jointpoint
+            %   jointPointCode - enumerate member
+            %   ruleCodes - list of rule type enumeration members
             for ruleCode=ruleCodes
                 obj.deactiveRule(jointPointCode,ruleCode);
             end
@@ -61,6 +73,8 @@ classdef RuleEngine<LoggableObject
         end
         %% Get rule codes for joint Point
         function r=getRuleCodes(obj,jointPoint)
+            %Gets list for specific joint point
+            %   jointPoint - enumerate member
             jpsc=RuleJointPoint.toString(jointPoint);
             if ~obj.ruleList.isKey(jpsc)
                 r=[];
@@ -81,7 +95,10 @@ classdef RuleEngine<LoggableObject
     %% Static invoke method
     methods(Static)
         function r=invoke(rullable,jointPoint)
-            % Assumption rullable is RullableObject class implementation
+            % Invoke rule on rullable object for joint point
+            %   Assumption rullable is RullableObject class implementation
+            %   rullable - implementation of abstract class 
+            %   jointpoint - the jointpoint enumerate
             engine=rullable.getRuleEngine;
             % Sanity check if there is anything to invoke (Rule engine initialized on object)
             if engine == 0 
@@ -106,6 +123,10 @@ classdef RuleEngine<LoggableObject
         
         %% InvokeRule
         function r=invokeRule(context,jointPointCode,ruleCode)
+            %Force invokes specific rule 
+            %   context - the map containing necessary rule artifacts
+            %   jointPointCode - the joint point code from enumeration 
+            %   ruleCode - the rule code from enumeration
             rule = 0;
             
             %Simplerule creation

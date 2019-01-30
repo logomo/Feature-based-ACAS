@@ -1,18 +1,19 @@
 classdef RulePostRulesOfAir<AbstractRule
-    %TESTRULE Summary of this class goes here
-    %   Detailed explanation goes here
+    %RulePostRulesOfAir result collection rule
+    %   Gets all spoils and constraints
     
     properties
-        missionControl
-        vehicleId
-        vehicleName
-        activeCollisionCases
-        avoidanceGrid
-        navigationGrid 
+        MissionControl          %UAS mission control object reference
+        vehicleId               %UAS UQ ID
+        vehicleName             %UAS name
+        activeCollisionCases    %Listiong of active collision cases related to UAS
+        avoidanceGrid           %avoidance grid reference
+        navigationGrid          %navigation grid reference
     end
     
     methods
         function obj = RulePostRulesOfAir(context,jointPointCode,ruleCode)
+            %Rule instance initialization
             obj = obj@AbstractRule(context,jointPointCode,ruleCode);
             %additional init function ality here
             % START
@@ -20,6 +21,7 @@ classdef RulePostRulesOfAir<AbstractRule
         end
 
         function r=parseContext(obj)
+            %[Overide] Parse the rule context
             priorFlag=parseContext@AbstractRule(obj);
             % Additional parse context functionality here
             % START
@@ -44,6 +46,7 @@ classdef RulePostRulesOfAir<AbstractRule
         end
         
         function r=testCondition(obj)
+            %[Override] sanity check of the rule data
             priorFlag=testCondition@AbstractRule(obj);
             % Additional condition statements
             % START
@@ -53,6 +56,7 @@ classdef RulePostRulesOfAir<AbstractRule
         end
         
         function r=invokeRuleBody(obj)
+            %[Override] Rule body implementation
             priorFlag=invokeRuleBody@AbstractRule(obj);
             % Additional invokations (yes we are summoning the rule :D)
             % START

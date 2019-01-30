@@ -1,26 +1,28 @@
 classdef RulePriorRulesOfAir<AbstractRule
-    %TESTRULE Summary of this class goes here
-    %   Detailed explanation goes here
+    %RulePriorRulesOfAir Check if there is any collision case which impair UAS manuevurability
+    
     
     properties
-        missionControl
-        vehicleId
-        vehicleName
-        collisionCases
-        activeCollisionCases
-        avoidanceGrid
-        navigationGrid
+        missionControl          %UAS mission control reference
+        vehicleId               %UAS UQ ID
+        vehicleName             %UAS name
+        collisionCases          %Listing of UTM provided collision cases
+        activeCollisionCases    %Listinh of colision cases with active participation of UTM
+        avoidanceGrid           %UAS avoidance grid reference
+        navigationGrid          %UAS navigation grid reference
     end
     
     methods
         function obj = RulePriorRulesOfAir(context,jointPointCode,ruleCode)
+            %Contructor for rule
             obj = obj@AbstractRule(context,jointPointCode,ruleCode);
             %additional init function ality here
-            % START
+            % START  
             % END
         end
 
         function r=parseContext(obj)
+            %[Override] Parse context to internal variables
             priorFlag=parseContext@AbstractRule(obj);
             % Additional parse context functionality here
             % START
@@ -52,6 +54,7 @@ classdef RulePriorRulesOfAir<AbstractRule
         end
         
         function r=testCondition(obj)
+            %[Override] Integrity and sanity check
             priorFlag=testCondition@AbstractRule(obj);
             % Additional condition statements
             % START
@@ -61,6 +64,7 @@ classdef RulePriorRulesOfAir<AbstractRule
         end
         
         function r=invokeRuleBody(obj)
+            %[Override]Rule body invocations
             priorFlag=invokeRuleBody@AbstractRule(obj);
             % Additional invokations (yes we are summoning the rule :D)
             % START

@@ -1,24 +1,25 @@
 classdef RuleConvergingManeuver<AbstractRule
-    %TESTRULE Summary of this class goes here
-    %   Detailed explanation goes here
+    %RuleConvergingManeuver Converging manuever enforcement
+    
     
     properties
-       vehicleId,
-       collisionCase,
-       collisionPoint,
-       missionControl,
-       avoidanceGrid,
-       velocity,
-       reachSet,
-       position,
-       orientation,
-       collisionCategory,
-       avoidanceRole,
-       safetyMargin,
+       vehicleId,           %UAS UQ ID    
+       collisionCase,       %Related collision case reference
+       collisionPoint,      %3D collision point GFC
+       missionControl,      %UAS Mission Control object reference
+       avoidanceGrid,       %UAS avoidance grid reference
+       velocity,            %UAS velocity
+       reachSet,            %UAS active reach set reference
+       position,            %UAS position at  the moment of detection
+       orientation,         %UAS orientation at the moment of detection
+       collisionCategory,   %Collision category
+       avoidanceRole,       %UAS ROW category
+       safetyMargin,        %Enforced minimal distance to adversity
     end
     
     methods
         function obj = RuleConvergingManeuver(context,jointPointCode,ruleCode)
+            %Rule initialization
             obj = obj@AbstractRule(context,jointPointCode,ruleCode);
             %additional init function ality here
             % START
@@ -26,6 +27,7 @@ classdef RuleConvergingManeuver<AbstractRule
         end
 
         function r=parseContext(obj)
+            %Context parsing
             priorFlag=parseContext@AbstractRule(obj);
             % Additional parse context functionality here
             % START
@@ -47,6 +49,7 @@ classdef RuleConvergingManeuver<AbstractRule
         end
         
         function r=testCondition(obj)
+            %Integrity check
             priorFlag=testCondition@AbstractRule(obj);
             % Additional condition statements
             % START
@@ -56,6 +59,7 @@ classdef RuleConvergingManeuver<AbstractRule
         end
         
         function r=invokeRuleBody(obj)
+            %Rule body application
             priorFlag=invokeRuleBody@AbstractRule(obj);
             % Additional invokations (yes we are summoning the rule :D)
             % START

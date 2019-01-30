@@ -1,17 +1,18 @@
 classdef AbstractRule<LoggableObject
-    %ABSTRACTRULE Summary of this class goes here
-    %   Detailed explanation goes here
+    %ABSTRACTRULE The abstract rule implemetation
+    
     
     properties
-        context
-        jointPointCode
-        ruleCode
-        ruleEngine
-        utmControl
+        context             % the map containing the necessary data
+        jointPointCode      % enumeration value
+        ruleCode            % enumeraiton value
+        ruleEngine          % rule engine instance reference
+        utmControl          % active utm control reference
     end
     
     methods
         function obj = AbstractRule(context,jointPointCode,ruleCode)
+            % Create abstract rule from context,jointPointCode,ruleCode
             Cmnf.logc(obj, ['Invoking rule:   ', RuleCode.toString(ruleCode)]);
             Cmnf.logc(obj, [' -- joint point: ', RuleJointPoint.toString(jointPointCode)]);
             contextString ='';
@@ -26,6 +27,7 @@ classdef AbstractRule<LoggableObject
         end
         
         function r=parseContext(obj)
+            %[Abstract] context parser function - needs to be enhanced in implementsaiton classs
             Cmnf.logc(obj, ['--START-- Parse context:   ', RuleCode.toString(obj.ruleCode)]);
             obj.ruleEngine=obj.context('ruleEngine');
             if isobject(obj.ruleEngine) && strcmp(class(obj.ruleEngine),'RuleEngine')
@@ -45,16 +47,19 @@ classdef AbstractRule<LoggableObject
         end
         
         function r=testCondition(obj)
+            % [Abstract] data/process integrity check - override
             Cmnf.logc(obj, ['--START-- Condition test:   ', RuleCode.toString(obj.ruleCode)]);
             r=true;
         end
         
         function r=invokeRuleBody(obj)
+            %[Abstract] rule application
             Cmnf.logc(obj, ['--START-- Invoke rule body:   ', RuleCode.toString(obj.ruleCode)]);
             r=true;
         end
         
         function r=runRule(obj)
+            %Run rule - reflection from rule engine, do not override
             parseFlag = obj.parseContext();
             Cmnf.logc(obj, ['-- END -- Parse context:   ', RuleCode.toString(obj.ruleCode)]);
             conditionFlag = obj.testCondition();

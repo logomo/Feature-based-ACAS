@@ -1,19 +1,20 @@
 classdef RuleCollisionCaseResulution<AbstractRule
-    %TESTRULE Summary of this class goes here
-    %   Detailed explanation goes here
+    %RuleCollisionCaseResulution Resolution for collision case
+    %   Use this template for your own implementation
     
     properties
-        missionControl
-        vehicleId
-        vehicleName
-        activeCollisionCases
-        participationCases
-        avoidanceGrid
-        navigationGrid
+        MissionControl          %Mission control reference
+        vehicleId               %UAS uq ID
+        vehicleName             %UAS name
+        activeCollisionCases    %Listing of active Collision cases
+        participationCases      %List of cases where UAS involved
+        avoidanceGrid           %Avoidance grid reference
+        navigationGrid          %Navigation grid reference
     end
     
     methods
         function obj = RuleCollisionCaseResulution(context,jointPointCode,ruleCode)
+            % For given context create rule instance
             obj = obj@AbstractRule(context,jointPointCode,ruleCode);
             %additional init function ality here
             % START
@@ -21,6 +22,7 @@ classdef RuleCollisionCaseResulution<AbstractRule
         end
 
         function r=parseContext(obj)
+            % [Override] Parse context 
             priorFlag=parseContext@AbstractRule(obj);
             % Additional parse context functionality here
             % START
@@ -44,6 +46,7 @@ classdef RuleCollisionCaseResulution<AbstractRule
         end
         
         function r=testCondition(obj)
+            %[Override] test Condition invocation
             priorFlag=testCondition@AbstractRule(obj);
             % Additional condition statements
             % START
@@ -65,6 +68,7 @@ classdef RuleCollisionCaseResulution<AbstractRule
         end
         
         function r=invokeRuleBody(obj)
+            %[Overide] invoke rule body abstreact function
             priorFlag=invokeRuleBody@AbstractRule(obj);
             % Additional invokations (yes we are summoning the rule :D)
             % START

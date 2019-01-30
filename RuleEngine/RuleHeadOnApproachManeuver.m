@@ -1,24 +1,25 @@
 classdef RuleHeadOnApproachManeuver<AbstractRule
-    %TESTRULE Summary of this class goes here
-    %   Detailed explanation goes here
+    %RuleHeadOnApproachManeuver Head on situation resolution for single UAS
+    
     
     properties
-       vehicleId,
-       collisionCase,
-       collisionPoint,
-       missionControl,
-       avoidanceGrid,
-       velocity,
-       reachSet,
-       position,
-       orientation,
-       collisionCategory,
-       avoidanceRole,
-       safetyMargin,
+       vehicleId,           %UAS UQ ID
+       collisionCase,       %Participating collision case reference
+       collisionPoint,      %3D GCF collision point
+       missionControl,      %UAS mission control reference
+       avoidanceGrid,       %UAS avoidance grid
+       velocity,            %UAS velocity at the moment of detection
+       reachSet,            %UAS active reach set reference
+       position,            %UAS actual position
+       orientation,         %UAS actual orientation
+       collisionCategory,   %Collision role of UAS
+       avoidanceRole,       %ROW categorization
+       safetyMargin,        %Separation distance
     end
     
     methods
         function obj = RuleHeadOnApproachManeuver(context,jointPointCode,ruleCode)
+            %Create rule instance based on context
             obj = obj@AbstractRule(context,jointPointCode,ruleCode);
             %additional init function ality here
             % START
@@ -26,6 +27,7 @@ classdef RuleHeadOnApproachManeuver<AbstractRule
         end
 
         function r=parseContext(obj)
+            %[Override] Parse rule context to internal datastructure
             priorFlag=parseContext@AbstractRule(obj);
             % Additional parse context functionality here
             % START
@@ -47,6 +49,7 @@ classdef RuleHeadOnApproachManeuver<AbstractRule
         end
         
         function r=testCondition(obj)
+            %[Override] test condition sanity check
             priorFlag=testCondition@AbstractRule(obj);
             % Additional condition statements
             % START
@@ -56,6 +59,7 @@ classdef RuleHeadOnApproachManeuver<AbstractRule
         end
         
         function r=invokeRuleBody(obj)
+            %[Override] rule body applicaiton
             priorFlag=invokeRuleBody@AbstractRule(obj);
             % Additional invokations (yes we are summoning the rule :D)
             % START

@@ -1,13 +1,14 @@
-classdef TestRule<AbstractRule
-    %TESTRULE Summary of this class goes here
-    %   Detailed explanation goes here
+classdef RuleStaticWeather<AbstractRule
+    %RuleStaticWeather [DEPRECATED] 
+    %   Weather implemented as soft/hard constraints
     
     properties
         
     end
     
     methods
-        function obj = TestRule(context,jointPointCode,ruleCode)
+        function obj = RuleStaticWeather(context,jointPointCode,ruleCode)
+            %[DEPRECATED]
             obj = obj@AbstractRule(context,jointPointCode,ruleCode);
             %additional init function ality here
             % START
@@ -15,6 +16,7 @@ classdef TestRule<AbstractRule
         end
 
         function r=parseContext(obj)
+            %[DEPRECATED]
             priorFlag=parseContext@AbstractRule(obj);
             % Additional parse context functionality here
             % START
@@ -24,6 +26,7 @@ classdef TestRule<AbstractRule
         end
         
         function r=testCondition(obj)
+            %[DEPRECATED]
             priorFlag=testCondition@AbstractRule(obj);
             % Additional condition statements
             % START
@@ -33,6 +36,7 @@ classdef TestRule<AbstractRule
         end
         
         function r=invokeRuleBody(obj)
+            %[DEPRECATED]
             priorFlag=invokeRuleBody@AbstractRule(obj);
             % Additional invokations (yes we are summoning the rule :D)
             % START
