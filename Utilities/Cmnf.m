@@ -1,34 +1,34 @@
 classdef Cmnf
-    %COMMON Summary of this class goes here
-    %   Detailed explanation goes here
+    %Cmnf Common functionality class
+    %   Covers all from configs to the stuff
     
     properties(Constant)
-        %Adversary intersection constants
-        precision = 0.2;
-        obstaclePrecision = 0.5;
-        steps = 3;
-        eliSteps = 5;
-        adversaryCounter  = 0;
+        %% Adversary intersection constants
+        precision = 0.2;                % minimal intersection precision in meters
+        obstaclePrecision = 0.5;        % maximal point cloud dispersion in meters
+        steps = 3;                      % linear backtracking intersection model minimum
+        eliSteps = 5;                   % elipsioidal step minimum
+        adversaryCounter  = 0;          % default adversary counter
         
-        %Debug constants
-        debugTree=0;
-        debugAdversary=0;
+        %% Debug constants
+        debugTree=0;                   % show possible tree when makind decision
+        debugAdversary=0;              % show adversary intersection process in verbose and graphic
         enabledTrace=false;            % trace functionality on loggable objects - turn off for demonstration
         enabledForcedTrace=false;      % second level trace functionality on loggable objects - turn off for demonstration
         enableRolling=true;            % enable rolling in console -- turn on for debugging
         enableNonlinearVehicle=false;  % enable nonlinear vehicle for more precise trajectories
         enableTracePlot=false;         % FALSE by default, TRUE for performance test - plane with no trace (false) or lines with decision points (true)    
-        enableTrajectoryTracePlot=true;
+        enableTrajectoryTracePlot=true; % show possible trace plot
         enableFigureExports=false;     % this should be by default disabled
-        pngExportPath='c:\\Sukromne\\';
+        pngExportPath='c:\\Sukromne\\'; % export path for figure to png
         
         
-        %plot constants
-        plotYellowDistance=5; %[m]
-        plotRedDistande=1.5; %[m]
-        plotCrashDistande=0.6; %[m]
+        %% Plot constants
+        plotYellowDistance=5;           % UAS conservative performance[m]
+        plotRedDistande=1.5;            % UAS adaptive performance[m]
+        plotCrashDistande=0.6;          % UAS crash distance [m]
 
-        %Simulation setup
+        %% Simulation setup
         vehicleSpeed=1;             % Vehicle default speed 1m/s
         simStep=1;                  % simulation step 1(s)
         reachibilityTreshold=0.98;  % stability treshold 98% is standard for TCAS/ACAS
@@ -37,6 +37,7 @@ classdef Cmnf
     
     methods(Static)
         function r=euc2plan(x,y,z)
+            %3D euclidian to planar transformation
             d = (x^2 + y^2 + z^2)^(1/2);
             dxy= (x^2 + y^2)^(1/2);
             theta = atan2(y,x);
@@ -44,9 +45,11 @@ classdef Cmnf
             r = [d;theta;psi];
         end
         function r=euc2planV(v)
+            %3D planar to euclidian transformation
             r=Cmnf.euc2plan(v(1),v(2),v(3));
         end
         function r= plan2euc(d,theta,phi)
+            %3D planar to euclidean parameters only
             dxy = cos(phi)*d;
             z = sin(phi)*d;
             y = sin(theta)*dxy;
@@ -55,6 +58,9 @@ classdef Cmnf
         end
         
         function r=rot2D(theta,mat)
+            %2D rotation matrix
+            %   theta - rotation angle 
+            %   matrix in row format
             ROT = [cos(theta), -sin(theta);
                    sin(theta), cos(theta)];
             r=ROT*mat;
@@ -69,7 +75,7 @@ classdef Cmnf
         end
         
         function ROT=rot3DMatrix(alpha,beta,gamma)
-            %Rodriguez rotation matrix
+            %Rodriguez rotation matrix for given angles
             ROT = [ cos(beta)*cos(gamma), cos(gamma)*sin(alpha)*sin(beta) - cos(alpha)*sin(gamma), sin(alpha)*sin(gamma) + cos(alpha)*cos(gamma)*sin(beta);
                     cos(beta)*sin(gamma), cos(alpha)*cos(gamma) + sin(alpha)*sin(beta)*sin(gamma), cos(alpha)*sin(beta)*sin(gamma) - cos(gamma)*sin(alpha);
                     -sin(beta),                                    cos(beta)*sin(alpha),                                    cos(alpha)*cos(beta)];
@@ -77,10 +83,16 @@ classdef Cmnf
         end
         
         function r=rot3Dvec(mat,vec)
+            %Rodriguez rotation matrix application on matrix
+            %   mat - 3 row matrix
+            %   vec - alpha/beta/gamma
             r=Cmnf.rot3D(vec(1),vec(2),vec(3),mat);
         end
         
         function r=align3Dvec(vec,mat)
+            %Align the vector on the same directive
+            %   mat - 3 row matrix
+            %   vec - the direction vector
             pla =Cmnf.euc2plan(vec(1),vec(2),vec(3));
             %alpha=atan2(z,y);
             %beta=-atan2(z,x); = -\varhphi
@@ -88,11 +100,16 @@ classdef Cmnf
             r=Cmnf.rot3D(0,-pla(3),pla(2),mat);
         end
         function r=ofst(vec,mat)
+            %Offset matrix to 3D point
+            %   vec - Offset point
+            %   mat - 3D point line matrix
             [m,n]=size(mat);
             r = mat + vec*ones(1,n);
         end
         
         function r=getMovement(mt)
+            %Get movement based on Movement type
+            %   mt - MovementType enumeration member
             velocity = 1;
             time = 1;
             omega_alpha=0;
@@ -135,6 +152,7 @@ classdef Cmnf
         end
         
         function r=getCubicOffsets(vec)
+            %Calculates cubbic offsets for vector
             cnt=1;
             ofsts=zeros(3,27);
             for k = [-1,0,1]
@@ -149,6 +167,7 @@ classdef Cmnf
         end
         
         function r=filterUnusedCells(map,list)
+            %Filter unused cells
             cnt =  length(list);
             r = [];
             for k=1:cnt
@@ -161,6 +180,10 @@ classdef Cmnf
         end
         
         function r=isInRange(point,cell,range)
+            %Check if point is in range of the cell
+            %   point - point to check
+            %   cell - base cell
+            %   range - layer/horizontal/vertical range
             distance=norm(cell.center-point,2);
             distanceWithDeviation=distance-cell.toleratedDeviation;
             flagD= distance<=range;
@@ -173,6 +196,11 @@ classdef Cmnf
         end
          
         function r=findCellsInRange(ag,initialCell,point,range)
+            %Find cells in distance range of the body around the initial intersection cell
+            %   ag - active grid
+            %   initialCell - initial intersection cell
+            %   point - reference point
+            %   range - the range around in [m]
             results = [DistanceGridCell(initialCell,range,0,1,1)];
             register = containers.Map;
             register(mat2str(initialCell.ijkIndex))=1;
@@ -194,6 +222,7 @@ classdef Cmnf
         end
         
         function probCells=intersectPointCloud(ag,candidates)
+            %[Deprecated] probabilistic distribution has been replaced
             probCells=[];
             register=containers.Map;
             [m,n]=size(candidates);
@@ -217,23 +246,24 @@ classdef Cmnf
             end
         end
         
-        % Creates adversarial column vector adv(5)
-        %   x=1 x-position of adversarial
-        %   y=2 y-position of adversarial
-        %   z=3 z-position of adversarial
-        %   p=4 probability of adversarial arrival
-        %   t=4 time of adversarial arrival
+        
         function r=getAdversaryVector(position,probability,timeofArrival)
+            %Creates adversarial column vector adv(5)
+            %   x=1 x-position of adversarial
+            %   y=2 y-position of adversarial
+            %   z=3 z-position of adversarial
+            %   p=4 probability of adversarial arrival
+            %   t=4 time of adversarial arrival
             r=[position;probability;timeofArrival];
         end
         
-        % Harmonic distribution calculation using tangensial sigmoid
-        % function
-        %   input \in <-1,1>
-        %               1
-        %   f(i) = 2 - --- e^(-10*i)
-        %               2
+                    
         function r=harmonicDistribution(fmin,fmax,val)
+            % Harmonic distribution calculation using tangensial sigmoid function
+            %   input \in <-1,1>
+            %               1
+            %   f(i) = 2 - --- e^(-10*i)
+            %               2
             range = fmax-fmin;
             center = val-fmin -1/2*range;
             input = center/(1/2*range);
@@ -241,6 +271,7 @@ classdef Cmnf
         end
         
         function r=log(msg)
+            % Log a message to console
             r=[datestr(datetime('now'),'YYYY-MM-DD '),datestr(datetime('now'),'HH:MM:SS.FFF'),' ', msg];
             if Cmnf.enableRolling
                 disp(r);
@@ -248,6 +279,7 @@ classdef Cmnf
         end
         
         function r=logc(obj,msg)
+            %Log message to console and use logable object ledger to keep action track
             nMsg=['[',class(obj),']',' ',msg];
             lc=Cmnf.log(nMsg);
             if Cmnf.enabledTrace && (isa(obj,'LoggableObject')) 
@@ -256,6 +288,7 @@ classdef Cmnf
         end
         
         function r=logcft(obj,msg)
+            %Log message to console and use logable object ledger to keep action track
             nMsg=['[',class(obj),']',' ',msg];
             lc=Cmnf.log(nMsg);
             if Cmnf.enabledForcedTrace&&(isa(obj,'LoggableObject')) 
@@ -264,6 +297,10 @@ classdef Cmnf
         end
         
         function r=glob2loc(pos,rot,mat)
+            %GCF->LCF transformation
+            %   pos - UAS position GCF
+            %   rot - UAS rotation GCF
+            %   mat - The point set to be transformed
             [m,n]=size(mat);
             pLoc=mat-pos*ones(1,n);
             ROT = Cmnf.rot3DMatrix(rot(1),rot(2),rot(3));
@@ -271,16 +308,22 @@ classdef Cmnf
         end
         
         function r=loc2glob(pos,rot,mat)
+            %LCF->GCF transformation
+            %   pos - UAS position GCF
+            %   rot - UAS rotation GCF
+            %   mat - The point set to be transformed
             [m,n]=size(mat);
             pGlob=Cmnf.rot3D(rot(1),rot(2),rot(3),mat);
             r=pGlob+pos*ones(1,n);
         end
         
         function r=calculatePointDistance(a,b)
+            %Calculate distance of two 2D/3D points
             r=norm(a-b,2);
         end
         
         function r=movementBuffer2String(mb)
+            %[Helper]Get movement buffer as string representation 
             r='[';
             mbl=length(mb);
             for k=1:mbl
@@ -293,6 +336,7 @@ classdef Cmnf
         end
         
         function r=bolleanString(b)
+            %[Helper]Transform boolen to string
             if b
                 r='true';
             else
@@ -301,9 +345,15 @@ classdef Cmnf
         end
         
         function [collisionFlag,mdest,time,mdist]=calculateLinearClash(p1,v1,p2,v2)
-            %Common function based on proceedings from:
-            %http://sections.maa.org/lams/proceedings/spring2001/bard.himel.pdf
-            %calculate coeficients
+            %Calculates linear clash
+            %   Common function based on proceedings from: http://sections.maa.org/lams/proceedings/spring2001/bard.himel.pdf
+            %   p1 - position vector for UAS1
+            %   p2 - position vector for UAS2
+            %   v1 - velocity LCF for UAS1
+            %   v2 - velocity LCF for UAS2
+            
+            
+            % calculate coeficients
             A=norm(v1)^2;
             B=2*(v1'*p1-v1'*p2);
             C=2*v1'*v2;
@@ -325,14 +375,17 @@ classdef Cmnf
         end
         
         function theta=minimalAnglesBetweenVectors(a, b)
+            %calculates minimal planar angle between two vectors on main planes
+            
             %a=a(1:2);b=b(1:2);
             theta = atan2(norm(cross(a,b)),dot(a,b));
             theta = rad2deg(abs(theta));
         end
         
         function a=minimalAnglesBetweenVectorsOld(v1, v2)
-            %Origin of both vectors is at 0
-            % Magnitude of vector is its norm
+            %[DEPRECATED] Calculates minimal planar angle between two vectors on main planes
+            %   Origin of both vectors is at 0
+            %   Magnitude of vector is its norm
             m(1) = norm(v1);
             m(2) = norm(v2); 
 
@@ -360,6 +413,7 @@ classdef Cmnf
         end
         
         function r=copyMap(oldMap)
+            %[Helper] copy map content to new intance
             r=containers.Map;
             keys=oldMap.keys;
             for k=1:length(keys)
@@ -589,6 +643,8 @@ classdef Cmnf
         end
         
         function exportFigure(name,id)
+            %Export figure to png file wiht 300 dpi
+            %   - check if the export is preffered
             if Cmnf.enableFigureExports
                 if nargin == 1
                     nm=name;
@@ -600,6 +656,7 @@ classdef Cmnf
         end
         
         function exportFigureForced(name,id)
+            % Forced Export figure to png file wiht 300 dpi
             if nargin == 1
                 nm=name;
             else
@@ -609,6 +666,7 @@ classdef Cmnf
         end
         
         function [newX,newY]=preparefillData(xx,yy,useZero)
+            %[Helper] - pretty plot data
             if nargin < 3
                 useZero = true;
             end
@@ -625,6 +683,7 @@ classdef Cmnf
         end
         
         function r=fill(xx,yy,color,lineStyle,alpha,edgecolor)
+            %[Helper] - pretty plot
             if nargin < 4
                 lineStyle='-';
             end
