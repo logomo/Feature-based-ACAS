@@ -1,55 +1,58 @@
 classdef GridCell < handle
-    %GRIDCELL Summary of this class goes here
-    %   Detailed explanation goes here
+    %GRIDCELL one cell in grid
     
     properties
         % Cell boundary
-        dStart
-        dEnd
-        thetaStart
-        thetaEnd
-        phiStart
-        phiEnd
+        dStart                      % Distance boundary start [m]
+        dEnd                        % Distance boundary end [m]
+        thetaStart                  % Horizontal angle boundary start [rad]
+        thetaEnd                    % Horizontal angle boundary end [rad]
+        phiStart                    % Vertical boundary start [rad]
+        phiEnd                      % Vertical boundary end [rad]
         
         % Probability for one cell
-        pReachability % agregated reachibility
-        pVisibility   % agregated visibility
-        pObstacle     % agregated obstacle probability
-        pDecision     % agregated decision rating
-        pFeasibility  % final feasibility
-        pAdversary    % probability of adversary type AdversaryVehicle TimedAdversaryVehicle
-        rReachability % rule rating for reachibility
-        rVisibility   % rule rating for visibility
-        rObstacle     % rule rating for obstacle probability
-        rDecision     % rule rating for decision rating
-        pDetectedObstacle = [];
-        pHinderedVisibility = [];
-        pMapObstacle = [];
+        pReachability               % agregated reachibility
+        pVisibility                 % agregated visibility
+        pObstacle                   % agregated obstacle probability
+        pDecision                   % agregated decision rating
+        pFeasibility                % final feasibility
+        pAdversary                  % probability of adversary type AdversaryVehicle TimedAdversaryVehicle
+        rReachability               % rule rating for reachibility
+        rVisibility                 % rule rating for visibility
+        rObstacle                   % rule rating for obstacle probability
+        rDecision                   % rule rating for decision rating
+        pDetectedObstacle = [];     % partial rating for detected obstacle
+        pHinderedVisibility = [];   % partial rating for visibility
+        pMapObstacle = [];          % partial ratings for obstacle
         % Cell center (according to general transformation to XYZ)
-        center
+        center                      % cell center LCF Euclid
         % Reference parameters
-        ijkIndex
-        layerIndex
-        horizontalIndex
-        verticalIndex
-        parrentGrid
-        parrentLayer
+        ijkIndex                    % distance/horizontal/vertical layer indexes
+        layerIndex                  % distance layer index
+        horizontalIndex             % horizontal layer index
+        verticalIndex               % vertical layer index
+        parrentGrid                 % reference to AvoidanceGrid structure
+        parrentLayer                % reference to distance layer structure (wave-front)
         %Graphic data
-        plotData=0
+        plotData=0                  % reference to GridPlotData object instance
         %Trajectories
-        trajectories=[];
-        arrivalTimes=[];
-        minimalEntryTime=0;
-        maximalLeaveTime=0;
-        toleratedDeviation=0;
-        %CellSurface calculation
-        outerCellSurface=0;
-        innerCellSurface=0;
+        trajectories=[];            % list of passing trajectories
+        arrivalTimes=[];            % list of trajectories arrival times (cell entry/leave time)
+        minimalEntryTime=0;         % calculated value of UAS minimal entry time [sec] LCF
+        maximalLeaveTime=0;         % calculated value of UAS maximal leave time [sec] LCF
+        toleratedDeviation=0;       % tolerated entry leave deviations 80 percent certainity time
+        %CellSurface calculation    
+        outerCellSurface=0;         % Outer cell surface - average surface per lidar hit
+        innerCellSurface=0;         % outer cell surface - average surface per lidar entry
     end
         
     methods
         %% Constructor
         function obj=GridCell(ds,de,ts,te,ps,pe)
+            % Constructor
+            %   ]ds,de] - distance range [m]
+            %   ]ts,te] - horizontal angle range  [rad]
+            %   ]ps,pe] - vertical angle range  [rad]
             if (nargin ~=0)
                 %initialize properties
                 obj.dStart=ds;
@@ -73,6 +76,7 @@ classdef GridCell < handle
         end
         
         function resetCell(obj)
+            %Reset cell structure to default - before intersection state
             obj.pReachability=~isempty(obj.trajectories);
             obj.pVisibility=1;
             obj.pObstacle=0;
@@ -88,6 +92,7 @@ classdef GridCell < handle
         end
         %% Probabilistic calculation
         function r=recalculateProbabilities(obj)
+            % Recalculate agregated obstacle, intruder, constraints, visibility, map obstacle ratings
             obj.recalculateObsbtacleAndVisibilityProbability;
             obj.pObstacle = (max([obj.recalculateAdversarySpreadProbability,...
                                  obj.pObstacle]))*obj.rObstacle;
@@ -96,6 +101,7 @@ classdef GridCell < handle
         end
         
         function recalculateObsbtacleAndVisibilityProbability(obj)
+            % Recalculate visibility and obstacle ratings
             detectedObstacles=obj.pDetectedObstacle;
             hinderedVisibility=obj.pHinderedVisibility;
             mapObstacles=obj.pMapObstacle;
@@ -137,6 +143,7 @@ classdef GridCell < handle
         end
             
         function r=recalculateAdversarySpreadProbability(obj)
+            %Calculate intruder intersection rating
             [m,n]= size(obj.pAdversary);
             if n >0
                 r = max(obj.pAdversary(4,:));% max of adversary probabilities
@@ -146,6 +153,7 @@ classdef GridCell < handle
         end
         
         function r=recalculateReachibility(obj)
+            %Calculates reachibility for Trajectories and cells 
             if isempty(obj.trajectories)
                 obj.pReachability=0;
             else
@@ -160,6 +168,7 @@ classdef GridCell < handle
         %% Plot data gathering
         %Probabilistic cell plot
         function r=buildPlotData(obj)
+            %[Helper] Builds a plot data for cell
             
             %outer arc
             arclen= (2*pi*obj.dEnd) * ((obj.thetaEnd-obj.thetaStart)/(2*pi));
@@ -224,6 +233,7 @@ classdef GridCell < handle
         end
         
         function r=getPlotData(obj)
+            %[Helper] Loads plot data in CellPlotData structure
             if ishandle(obj.plotData) && ~strcmp(get(obj.plotData,'type'),'GridCellPlotData')
                 obj.plotData = obj.buildPlotData;
             end
@@ -233,6 +243,7 @@ classdef GridCell < handle
         end
         %% Trajectory register
         function r=calculateArrivalTime(obj)
+            % Based on incomming trajectories calculates entry/leave time for cell
             if ~isempty(obj.trajectories)
                 traj = obj.trajectories;
                 cnt = length(traj);
@@ -247,12 +258,15 @@ classdef GridCell < handle
         end
         
         function r=registerTrajectory(obj,traj)
+            % Register newly intersected trajectory into cell
             r=traj;
             obj.trajectories=[obj.trajectories,traj];
         end
         
         function r=expand(obj,farCount,nearCount)
-            
+            %Wawefront - Coverage maximizing Reach set approximation, implementation in cell
+            %	farCount - count of trajectories to be propagated out of the cell lying close  to walls
+            %   nearCount - count fo trajectories to be propagated out of the cell lying close to center
             if length(obj.trajectories) > 0
                 dist = [];
                 straightLine=0;
@@ -281,6 +295,7 @@ classdef GridCell < handle
         end
         
         function r=expandRapid(obj)
+            %Turn minimizing reach set approximation rapid expansion procedure for cell
             r=[];
             if length(obj.trajectories) > 0
                 for k=0:8
@@ -292,6 +307,7 @@ classdef GridCell < handle
         end
         
         function r=findBestExpandCandidate(obj,mt)
+            %Find best smooth trajectories for expansion Turn minimizing 
             if length(obj.trajectories) > 0
                 index = [];
                 value = [];
@@ -318,11 +334,11 @@ classdef GridCell < handle
             r=[];
         end
         
-        % Expand ACAS style for trajectories in cell
-        %   obj - self reference
-        %   lm - linearized model for predictor
-        %   separations - list of available MovementGroups
         function r=expandACAS(obj,lm,separations)
+            % Expand ACAS style for trajectories in cell
+            %   obj - self reference
+            %   lm - linearized model for predictor
+            %   separations - list of available MovementGroups
             r=[];
             % First just all candidates
             % candidates=obj.trajectories;
@@ -409,6 +425,10 @@ classdef GridCell < handle
         %   DISCLAIMER - DO NOT USE THIS TYPE OF INTEGRATION unstable as
         %   hell
         function r=calculateSurface(obj,meanDistance)
+            %[DEPRECATED] % calculates surface of passing cell for mean distance
+            %   meanDistance - mean distance of hits
+            %   DISCLAIMER - DO NOT USE THIS TYPE OF INTEGRATION unstable as
+            %   hell
             r=0;
             if obj.phiStart <0 && obj.phiEnd <=0
                 r=meanDistance^2*(cos(abs(obj.phiEnd))-cos(abs(obj.phiStart)))*(obj.thetaEnd-obj.thetaStart);
@@ -427,10 +447,14 @@ classdef GridCell < handle
             end
             r=r;
         end
+        
         % Calculates surface of passing cell for mean distance
         %   meanDistance - mean distance of hits
         %   THIS ONE VERY STABLE
         function r=calculateSurface2(obj,meanDistance)
+            % Calculates surface of passing cell for mean distance
+            %   meanDistance - mean distance of hits
+            %   THIS ONE VERY STABLE
             r=0;
             if obj.phiStart <0 && obj.phiEnd <=0
                 r=meanDistance^2*(sin(abs(obj.phiStart))-sin(abs(obj.phiEnd)))*(obj.thetaEnd-obj.thetaStart);
@@ -446,8 +470,9 @@ classdef GridCell < handle
             r=r;
         end
         
-        % Calculates inner and outer surface of cell
+        
         function r=calculateSurfaceInnerOuter(obj)
+            % Calculates inner and outer surface of cell
             obj.outerCellSurface=obj.calculateSurface2(obj.dEnd);
             if obj.dStart ~= 0                                              %there is no inner surface if cell is near the starting position .....
                 obj.innerCellSurface=obj.calculateSurface2(obj.dStart);

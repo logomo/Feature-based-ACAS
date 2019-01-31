@@ -1,5 +1,5 @@
 classdef PredictorNode<LoggableObject
-    %UNTITLED Summary of this class goes here
+    %PredictorNode Summary of this class goes here
     %   Detailed explanation goes here
     
     properties
@@ -23,9 +23,9 @@ classdef PredictorNode<LoggableObject
         cellLeaveTime=0; % Leave time from cell
         movementCost=0;  % Unitary movement cost 
         trajectoryCost=0; % trajectory cost
-        directTrajectoryFlag=true;
+        directTrajectoryFlag=true; % If the trajectory consist only from straight movements
         movementGroups %[] for ACAS trees only
-        isACASPreffered=false;
+        isACASPreffered=false; %Indication if ACAS is preffered separaiton style (NO)
         
         %Statistical properties
         pFeasibility=1;     %trajectory probability of feasibility 
@@ -42,8 +42,8 @@ classdef PredictorNode<LoggableObject
         rReachibility = 1;  %rule ratio of reachibility  (100% unchanged by rule)
         
         %Rule engine parameters
-        flagDistanceFeasibility = true;
-        flagHeadingFeasibility =true;
+        flagDistanceFeasibility = true; %if the distance to the collision point is ok
+        flagHeadingFeasibility =true; % if the heading to the collision point is ok
     end
     
     methods
@@ -58,7 +58,12 @@ classdef PredictorNode<LoggableObject
         %  obj - parrent reference
         %  grid - avoidance grid object handle
         %  linearModel - system linearized model for working point
-        function r=normalExpand(obj,grid,linearModel)                                 
+        function r=normalExpand(obj,grid,linearModel)             
+            % Plain expansion, used for normal expansion of selected node
+            %  (out)r - list of newly created leafs
+            %  obj - parrent reference
+            %  grid - avoidance grid object handle
+            %  linearModel - system linearized model for working point
             if obj.expanded == 0                                            % Check if node has been expanded, if not continue for expansion
                 for k=0:8                                                   % For each movement from movement bank -k=0:8
                     newstate=linearModel.predict(obj.state,k);              % Create new state based on parrent state, 
@@ -105,6 +110,12 @@ classdef PredictorNode<LoggableObject
         % tReg - trajectory register
         % tMax - trajectory maximum - expansion ratio - default 9
         function r=expand(obj,grid,linearModel,tReg,tMax)
+            % Chaotic expansion
+            % obj - object reference
+            % grid - avoidance grid reference
+            % linearModel - linearized model for predictor function
+            % tReg - trajectory register
+            % tMax - trajectory maximum - expansion ratio - default 9
             if obj.expanded == 0                                             % Initialize movement set
                 if obj.movement== 0                                          % If parrent.movement == Straight
                     movementSet = 0:8;                                       % Use full movement set 0:8
@@ -165,6 +176,13 @@ classdef PredictorNode<LoggableObject
         %   linearModel - lineralized model for predictions
         %   separations - availible separations
         function r=expandACAS(obj,grid,linearModel,separations)
+            % Cell expansion function for ACAS-XU like tree
+            %   obj - object refe3rence
+            %   grid - AvoidanceGrid reference
+            %   linearModel - lineralized model for predictions
+            %   separations - availible separations
+            
+            
             % check if path was expanded
             if obj.expanded == 0
                 %Cmnf.logc(obj,['Expanding node ', mat2str(obj.id)]);
@@ -225,6 +243,8 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=reachFinalLayerTest(obj,finalLayer)
+            % Check if final layer has been reached
+            % finalLayer - index of the final layer
             if (obj.depth == finalLayer)
                 obj.reachFinalLayer=1;
             else
@@ -242,6 +262,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=pruneBasedOnFinalLayer(obj)
+            % Remove dangling trajectories part which does not reached final layer - ghost paths pruning wavefront
             if ~isempty(obj.leafs)
                 rating = [];
                 for k = 1: length(obj.leafs)
@@ -258,6 +279,8 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=pruneLastSpread(obj,lastLayer)
+            % Remove last unecessary spreads leading outside of the avoidance grid
+            %   lastLater - last layer index
             if ~isempty(obj.leafs)
                 if (obj.depth == (lastLayer-1))
                     candidate= [];
@@ -278,6 +301,7 @@ classdef PredictorNode<LoggableObject
         end
            
         function r=collectLeafs(obj)
+            %Collect all leafs in the trajectories
             l=length(obj.leafs);
             if (l==0)
                 r=[obj];
@@ -290,6 +314,8 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=countNodes(obj,leafsOnly)
+            %Count nodes sprouting from the root - recursion
+            %   leafsOnly - true/false => only dangling leafs/include inner parts
             r=0;
             if isempty(obj.leafs)
                 r=1;
@@ -304,6 +330,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=registerSelf(obj)
+            % Register owned segment in passing cells.
             r=0;
             if obj.root ~= obj
                 cell=obj.referencedCell;
@@ -318,7 +345,8 @@ classdef PredictorNode<LoggableObject
             end
         end
         
-        function calculateCost(obj)            
+        function calculateCost(obj)
+            %recursive trajectory cost calculation 
             obj.calculateCostNode;
             if ~isempty(obj.leafs)
                 for k=1: length(obj.leafs)
@@ -328,6 +356,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function calculateCostNode(obj)
+            %Single node trajectory segment cost calculation
             [m,n]=size(obj.state);
             if obj.depth == 0
                 obj.movementCost=1;
@@ -343,6 +372,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function calculateProbability(obj)
+            %Reach set ratings calculation - recursive call
             obj.calculateNodeProbability;
             if ~isempty(obj.leafs)
                 for k=1: length(obj.leafs)
@@ -352,6 +382,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function calculateNodeProbability(obj)
+            % Reach set ratings calculation - single node ratings
             if obj ~= obj.root
                %calculate movement distribution
                obj.cObstacle = (obj.referencedCell.pObstacle)*obj.rObstacle;
@@ -368,6 +399,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=calculateTrajectoryEntryLeave(obj)
+            %calculate entry/leave times for trajectory into cell - recursive call
             cell = obj.referencedCell;                                  %Fetch referenced  cell
             worker=obj;                                                 %Reference transition obj == worker
             [m,n]=size(worker.state);                                   %extract position from worker
@@ -388,6 +420,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function resetNodeParameters(obj)
+            %[Helper] Reset node ratings and other calculated parameters 
             obj.pFeasibility=1;     %trajectory probability of feasibility 
             obj.pObstacle = 0;      %trajectory probability of obstacle
             obj.pVisibility = 1;    %trajectory probability of visibility
@@ -405,6 +438,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=resetParameters(obj)
+            %[Helper] Reset node ratings and other calculated parameters -recursive call
             r=1;
             obj.resetNodeParameters;
             if ~isempty(obj.leafs)
@@ -415,6 +449,8 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=collectMovements(obj)
+            % Get command chain for movement buffer
+            %   (out) r - ordered list of movements to replicate given trajectory as a segment
             if obj.parrent~=0
                 r=[obj.parrent.collectMovements,obj.movement];
             else
@@ -423,6 +459,8 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=checkTrajectoryRange(obj,hCellRange,vCellRange)
+            % Check if trajectory belongs to space range of avoidance grifd
+            %   (out) true/false
             if obj.root == obj
                 r = true;
             else
@@ -435,7 +473,11 @@ classdef PredictorNode<LoggableObject
             end
             
         end
+        
         function r=selectTrajectories(obj,hCellRange,vCellRange)
+            % Select trajectories belonging to specific cell range,
+            %   hCellRange - interval range  for horizontal indexes
+            %   vCellRange - interval range for vertical indexes
             r=[];
             if obj.root == obj
                 for k=1:length(obj.leafs)
@@ -464,6 +506,9 @@ classdef PredictorNode<LoggableObject
         end
         
         function node=generateGraph(obj,register)
+            %[Deprecated] Black Magic
+            
+            
             % determine hash code
             if (obj ~= obj.root)
                 h=obj.mycell;
@@ -485,6 +530,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function register=getTrajectoryRegister(obj,register)
+            %[Deprecated] Black Magic
             if (nargin==1)
                 register=containers.Map;
             end
@@ -501,6 +547,8 @@ classdef PredictorNode<LoggableObject
         end
      
         function plotTrajectoryStat(obj, mode)
+            %Plot Trajectory with coloring based on mode stat
+            %   mode - rating parameter to be shown
             if obj ~= obj.root
                 if mode == StatisticType.Reachability
                     pre=obj.pReachibility; 
@@ -551,6 +599,8 @@ classdef PredictorNode<LoggableObject
             end
         end
         function plotTrajectoryWide(obj, color)
+            %[Helper ]Plot Trajectory with coloring based on mode stat nice and wide
+            %   color - a nice color for plot
             if nargin ==1
                 color = 'c';
             end
@@ -564,6 +614,7 @@ classdef PredictorNode<LoggableObject
         end
         
         function r=getLocalPositionOrientation(obj)
+            % Returns LCF position and orientation
             [m,n]=size(obj.state);
             r=obj.state(1:6,n);
         end
@@ -573,6 +624,9 @@ classdef PredictorNode<LoggableObject
                 calculateOperatibleSpaceNode(obj,missionControl,linearVelocity,...
                 vehiclePosition,vehicleOrientation,collisionPoint,...
                 ruleSafetyMargin)
+            % Checks if the node meets rule heading and rule space restrictions
+            
+            
             % Grab node local position orientation
             nodeLocPosOr=obj.getLocalPositionOrientation;
             % 1st triplet in state is position (local)
@@ -614,6 +668,7 @@ classdef PredictorNode<LoggableObject
         function r=calculateOperatibleSpace(obj,missionControl,linearVelocity,...
                 vehiclePosition,vehicleOrientation,collisionPoint,...
                 ruleSafetyMargin)
+            % Check planar feasibility
             r=0;
             [flagDistanceFeasibility,flagHeadingFeasibility]= ...
                 obj.calculateOperatibleSpaceNode(missionControl,linearVelocity,...
@@ -631,6 +686,7 @@ classdef PredictorNode<LoggableObject
         
         
         function r=applyOperatibleSpaceNode(obj)
+            % Recursive disabling of undesirable trajectories in rule body
             if ~(obj.flagDistanceFeasibility && obj.flagHeadingFeasibility)
                 obj.rFeasibility = 0;   % Impact on feasibility of trajectory ...
                 obj.rObstacle = 1;      % No impact on obstacle
@@ -651,6 +707,7 @@ classdef PredictorNode<LoggableObject
         
         %% Hard constraints
         function r=applyHardConstraint(obj,mc,cc)
+            %Apply hard/soft constraints on trajectories
             r=0;
             posor=obj.getLocalPositionOrientation();
             if cc.isIntersection(posor,mc,obj)

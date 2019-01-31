@@ -3,28 +3,34 @@ classdef GridLayer<handle
     %   Detailed explanation goes here
     
     properties
-        cells;
-        layerIndex;
-        parrentGrid;
-        verticalCellCount = 0;
-        horizontalCellCount = 0;
-        thetaStart
-        thetaEnd
-        phiStart
-        phiEnd
-        dStart
-        dEnd
-        stepsTheta
-        avgStepTheta
-        stepsPhi
-        avgStepPhi
-        minimalEntryTime=0;
-        maximalLeaveTime=1;
-        toleratedDeviation = 0;
+        cells;                    % [m to n] array of cells representing one distance slice of Avoidance Grid 
+        layerIndex;               % the layer index in Avoidance grid counted of the vehicle 
+        parrentGrid;              % the reference to parent avoidance grid object
+        verticalCellCount = 0;    % the count of vertical layers [m]
+        horizontalCellCount = 0;  % the count of horizontal layers [n]
+        thetaStart                % horizontal range start [rad]
+        thetaEnd                  % horizontal range end [rad] 
+        phiStart                  % vertical range start [rad]
+        phiEnd                    % vertical range end [rad]
+        dStart                    % distance start [m]
+        dEnd                      % distance end [m]
+        stepsTheta                % count of vertical layers
+        avgStepTheta              % range lenght of horizontal angle for one cell
+        stepsPhi                  % count of horizontal layers
+        avgStepPhi                % range length of vertical angle for one cell
+        minimalEntryTime=0;       % layer minimal entry time - agregation from cells
+        maximalLeaveTime=1;       % layer maximal leave time - aggregation from cells
+        toleratedDeviation = 0;   % tolerated deviation range 80 percent
     end
     
     methods
         function obj = GridLayer(ds,de,ts,te,ps,pe,hc,vc)
+            % Constructor for layer based on input parameters
+            %   ]ds,de] - distance range - one layer [m,m]
+            %   ]ts,te] - horizontal range - all layers [rad,rad]
+            %   ]ps,pe] - vertical range - all layers [rad,rad]
+            %   hc - horizontal layer count [1,N]
+            %   vc - vertical layer count [1,N]
             if (nargin ~=0)
                 obj.thetaStart = ts;
                 obj.thetaEnd = te;
@@ -49,6 +55,7 @@ classdef GridLayer<handle
         end
         
         function linkIt(obj)
+            %[Helper] Structure linking
             for k=1:obj.horizontalCellCount;
                 for l=1:obj.verticalCellCount;
                    cell = obj.cells(k,l);
@@ -63,6 +70,7 @@ classdef GridLayer<handle
             end
         end
         function resetLayer(obj)
+            %[Helper] Restart of all ratings in layer and cell
             for k=1:obj.horizontalCellCount
                 for l=1:obj.verticalCellCount
                         obj.cells(k,l).resetCell;
@@ -71,6 +79,9 @@ classdef GridLayer<handle
         end
         
         function r=getCellIndexes(obj,theta,phi)
+            %Gets cell horizontal index and vertical index based on the planar point angles
+            %   theta - horizontal point offset
+            %   phi - vertical point offset
             if  obj.thetaStart > theta || obj.thetaEnd < theta || obj.phiStart > phi || obj.phiEnd < phi
                 r=0;
             else
@@ -87,6 +98,7 @@ classdef GridLayer<handle
         end
         
         function r=calculateArrivalTime(obj)
+            % Calculates layer entry/leave time based on intersecting trajectories
             wLayer=obj;
             cellCount = wLayer.horizontalCellCount*wLayer.verticalCellCount;
             passingTimes= zeros(2,cellCount);
@@ -116,7 +128,10 @@ classdef GridLayer<handle
             end
             r = passingTimes;
         end
+        
+        
         function r=calculateToleratedDistanceDeviation(obj)
+            %Calculates tolerated distance deviations based on the layer entry/leave time distribution
             cell = obj.cells(1);
             center = cell.center;
             maxPoint=Cmnf.plan2euc(cell.dEnd,cell.thetaStart,cell.phiStart);
@@ -128,7 +143,11 @@ classdef GridLayer<handle
             end
             r=maxDistnace;
         end
+        
         function r=expand(obj,farCount,nearCount)
+            % Coverage maximizing Reach set approximation recursive call on layer level
+            %   farCount - tuning parameter  - middle passing trajectories 
+            %   nearCount - tuning parameter - wall enclosing trajectories
             [m,n] = size(obj.cells);
             r=[];
             for k=1:m
@@ -139,6 +158,8 @@ classdef GridLayer<handle
         end
         
         function r=expandRapid(obj)
+            % Turn minimizing reach set approximation, recursive call on layer level
+           
             [m,n] = size(obj.cells);
             r=[];
             for k=1:m
@@ -149,6 +170,7 @@ classdef GridLayer<handle
         end
         
         function r=expandACAS(obj,lm,separations)
+            % ACAS-like Reach set approximation, recursive call on layer level
             [m,n] = size(obj.cells);
             r=[];
             for k=1:m
