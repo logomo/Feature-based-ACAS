@@ -1,18 +1,22 @@
 classdef GraphNode < LoggableObject
-    %GRAPHNODE Summary of this class goes here
-    %   Detailed explanation goes here
+    %GRAPHNODE Represents one reach set node (See AvoidanceGrid.PredictorNode)
+    
     
     properties
-        id;
-        hash;
-        cell;
-        position;
-        links;
-        ref;
+        id;             %Unique identifier of the node 
+        hash;           %String key to identify (cell hash)
+        cell;           %Parrent cell reference
+        position;       %XYZ euclidean LCF position (see Avoidance Grid)
+        links;          %List of directed connections from other nodes(in)
+        ref;            %List of directed connections to other nodes (out)
     end
     
     methods
         function obj=GraphNode(id,cell,position)
+            % Contructor creating node based on uq id, referenced cell and position
+            %   id - uq key
+            %   cell - referenced cell where node lies in LCF
+            %   position - node XYZ LCF position
             if nargin ~= 0 
                 obj.id=id;
                 if cell == 0 
@@ -28,6 +32,8 @@ classdef GraphNode < LoggableObject
         end
         
         function r=registerLink(obj,node)
+            % Registers link to the node checking references to disable circularity
+            %   node - next node 
             if ~obj.links.isKey(node.hash)
                 obj.links(node.hash)=node;
                 obj.ref=[obj.ref,node];
@@ -36,7 +42,9 @@ classdef GraphNode < LoggableObject
                 r=false;
             end
         end
+        
         function r=plot(obj)
+            %Plots the node in 3D enviroment
             hold on
             %plot node point
             pos=obj.position;
@@ -59,6 +67,7 @@ classdef GraphNode < LoggableObject
         end
         %robust plot function (if there are cycles in reach set)
         function plot2(obj,visited)
+            %Plots the node in 3D enviroment,robust plot function (if there are cycles in reach set)
             if nargin==1
                 visited = containers.Map;
             end
@@ -88,6 +97,8 @@ classdef GraphNode < LoggableObject
         end
         
         function plotColoredGraph(obj,statId)
+            %Recursive function to plot statistics in colored node graph, 
+            %   statId - the enumeration Statistic
             if nargin==1
                 
                 statId =  StatisticType.Reachability;
@@ -97,6 +108,7 @@ classdef GraphNode < LoggableObject
         end
         
         function plotColoredGraphRecursion(obj,statId,visited)
+            %[HELPER] the recursive call of plotColoredGraph function
             if ~(visited.isKey(obj.hash))
                 obj.hash;
                 visited(obj.hash)=1;

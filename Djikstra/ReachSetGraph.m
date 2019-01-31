@@ -1,17 +1,21 @@
 classdef ReachSetGraph<LoggableObject
-    %REACHSETGRAPH Summary of this class goes here
-    %   Detailed explanation goes here
+    %REACHSETGRAPH Reach set representation as graph object
+    %   There is another representaiton posibility out of the trajectory tree 
+    %   The Graph of oriented lines is one of them
+    %   This class will extract such graph from existing avoidance grid
     
     properties
-        avoidanceGrid
-        root            %entry point (it should be tree so root ?)
-        register
-        nodeList
-        trajectories
+        avoidanceGrid       % Avoidance grid class with initialized Reach Set Reference
+        root                % PredictorNode object representing reach set root 
+        register            % The register of the nodes used to build up a graph
+        nodeList            % List of graph nodes
+        trajectories        % Set of trajectories 
     end
     
     methods
         function obj=ReachSetGraph(ag)
+            %Contructor accepting initialized avoidance grid with Reach set calculated
+            %   ag - avoidance grid object handle
             root = ag.reachSet;
             register=containers.Map;
             graphRoot=GraphNode(1,0,[0;0;0]);
@@ -32,6 +36,8 @@ classdef ReachSetGraph<LoggableObject
         end
         
         function putObstacle(obj,os)
+            %Put obstacle object implementing AbstractObstacle interface into operation space
+            %   os - Abstract Obstacle to be put into the "Avoidance Grid"
             [m,n]=size(os.points);
             for k=1:n
                 cell = obj.avoidanceGrid.getCellEuclidian(os.points(1:3,k));
@@ -43,6 +49,11 @@ classdef ReachSetGraph<LoggableObject
         end
         
         function [costs,paths]=findPaths(obj,statId)
+            %Find paths leading to the graph nodes 
+            % (out) costs - list of performance evaluations use index
+            % (out) paths - list of paths use index
+            % statId - statistics refer to StatisticType to be caclulated
+            
             % Adjacent matrix if I->J then A(I,J)=1
             nodeCount=obj.register.Count;
             A=zeros(nodeCount);
@@ -94,6 +105,10 @@ classdef ReachSetGraph<LoggableObject
         end
         
         function trajectories=generateTrajectories(obj, costs,paths)
+            % Generate trajectories feasible for the avoidance
+            %   (out) trajectories - list of feasible trajectories
+            %   costs - ordered list of evaluated costs
+            %   paths - ordered list of paths
             trajectories=[];
             for k=1:length(costs)
                 trajectories=[trajectories,DijkstraTrajectory(k,costs(k),paths{k},obj.nodeList)];
@@ -102,6 +117,11 @@ classdef ReachSetGraph<LoggableObject
         end
         
         function [unfeasible,feasible,feasibilityMap]=assessExistance(obj,trajectoryRegister)
+            %Assess the dynamic constraint on selected trajectories
+            %   (out) unfeasible     - list of trajectories which are not feasible with given UAS dynamic constraints
+            %   (out) feasible       - list of perfectly feasible trajectories 
+            %   (out) feasibilityMap - mapping of the feasible trajectories to avoidance grid reagion
+            %   trajectoryRegister   - the trajectory registref of standard Avoidance Grid
             feasible = [];
             unfeasible = [];
             feasibilityMap=containers.Map('KeyType','double','ValueType','any');
@@ -119,6 +139,9 @@ classdef ReachSetGraph<LoggableObject
         end
         
         function plot(obj,statId)
+            %Plots evaluated Reach set representation
+            %   statId - the statistic type enumeraiton mebmer
+            %       Supports: Reachability Obstacle  Visibility ratings
             if nargin==1
                 statId=StatisticType.Reachability;
             end
