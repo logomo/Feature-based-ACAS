@@ -1,14 +1,13 @@
-%% This class is used for Separation avoidance trees build, there is no reason to use it in full reach set
-% The purpose of Separation avoidance is to show inferiority of the other
-% separated approaches, 
 classdef MovementGroup<uint32    
-    
+
+    % MovementGroup This class is used for Separation avoidance trees (ACAS-X like) build, there is no reason to use it in full reach set
+    %   The purpose of Separation avoidance is to show inferiority of the other separated approaches, 
     enumeration
-        Horizontal(1),  % left right straigth
-        Vertical(2),
-        Backslash(3),
-        Slash(4),
-        Combined(5) 
+        Horizontal(1),  % Movements on horizontal plane GCF
+        Vertical(2),    % Movements on vertical plane  GCF
+        Backslash(3),   % Movements on plane with - 45 deg angle with horizontal
+        Slash(4),       % Movements on plane with + 45 deg angle and +90 angle to Backslash plane
+        Combined(5)     % All separation planes, horizontal, vertical, slash and backslash
     end
     
     methods(Static)
@@ -17,6 +16,8 @@ classdef MovementGroup<uint32
         end
     
         function r=getMovementGroupMembers(group)
+            %Gets a list of Movement Types supported in given movement group
+            %   grou - MovementGroup enumeration member
             if group == MovementGroup.Vertical
                 r=[MovementType.Up,MovementType.Down,MovementType.Straight];
             end
@@ -35,6 +36,8 @@ classdef MovementGroup<uint32
         end
         
         function r=getTrajectoryGroups(predictorNode)
+            %For Given trajectory (PredictorNode instance) the list of viable Movement Groups are returned
+            %   predictorNode - the tip of the trajectory
             r=[];
             movements = predictorNode.collectMovements;
             for k=1:4

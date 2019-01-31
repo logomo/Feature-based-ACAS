@@ -1,12 +1,10 @@
 classdef CostraintType<uint32
-    %CostraintType Summary of this class goes here
-    %   Detailed explanation goes here
-    
+    %CostraintType DEfines the type of virtual constraints, use static/moving, soft/hard spec
     enumeration
-        Static(1)
-        Moving(2)
-        Soft(3)
-        Hard(4)
+        Static(1)   %Stay at same spot over time
+        Moving(2)   %Move along linear path
+        Soft(3)     %Breachable constraint
+        Hard(4)     %Unbreachable constraint
     end
     methods(Static)
         function r=toString(member)

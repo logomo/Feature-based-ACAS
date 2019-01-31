@@ -1,10 +1,9 @@
 classdef ObstacleType<uint32
-    %OBSTACLETYPE Summary of this class goes here
-    %   Detailed explanation goes here
+    %OBSTACLETYPE Type of AbstractObstacle and subclasses 
     
     enumeration
-        Map(1)
-        Detected(2)
+        Map(1)      %This obstacle is handled as a Map sourced obstacle
+        Detected(2) %This obstacle is handled as a Real physical obstacle
     end
     methods(Static)
         function r=toString(member)

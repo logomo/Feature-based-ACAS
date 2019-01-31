@@ -1,4 +1,5 @@
-classdef RuleCode<uint32    
+classdef RuleCode<uint32 
+    %Rule engine rule types enumeration, refer to \RuleEngine for implementation details
     enumeration
         PriorRulesOfAir(0),
         PostRulesOfAir(1),

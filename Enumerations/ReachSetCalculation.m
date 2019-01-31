@@ -1,5 +1,5 @@
 classdef ReachSetCalculation<uint32
-
+    %ReachSetCalculation defines type of reach set approximation
     enumeration
         Harmonic(1),             %Default navigation
         CellSpread(2),           %Maximum coverage
@@ -14,6 +14,10 @@ classdef ReachSetCalculation<uint32
         end
     
         function r=createReachSet(avoidanceGrid,type,parameters) 
+            %[Utility] Creates true and only one reach set
+            %   avoidanceGrid - empty not initialized Avoidance Grid
+            %   type - ReachSetCalculation enumeration member 
+            %   parameters - map containing parameters - see test for reach set creation in /TESTS
             %% default parameters
             % Avoidance grid
             defDs=0;defDf=10; defTheta=pi/4; defPhi= pi/6;

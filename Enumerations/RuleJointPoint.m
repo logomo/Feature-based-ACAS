@@ -1,4 +1,5 @@
-classdef RuleJointPoint<uint32    
+classdef RuleJointPoint<uint32  
+    %Rule engine joint point types enumeration, refer to \RuleEngine for implementation details
     enumeration
         MissionControlRunOnce(0),
         MissionControlNextWaypoint(1),

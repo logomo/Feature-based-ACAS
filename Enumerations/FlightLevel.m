@@ -1,6 +1,5 @@
 classdef FlightLevel<uint32
-    %FLIGHTLEVEL Summary of this class goes here
-    %   Detailed explanation goes here
+    %FLIGHTLEVEL Flight level enumeration, contains only few for UTM/CollisionCase showcasing
     
     enumeration
         FL460(46000), %Level abowe

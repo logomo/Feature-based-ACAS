@@ -1,12 +1,11 @@
 classdef ManeuverabilityCategory<uint32
-    %STATISTICTYPE Summary of this class goes here
-    %   Detailed explanation goes here
+    %ManeuverabilityCategory This defines manuevurability of the air trafic attendant used in Collision Case resolution process
     
     enumeration
-       AltitudeControl(1),
-       FullNoPropulsion(2),
-       FullPropulsionGliding(3),
-       FullPropulsionVTOL(4),
+       AltitudeControl(1),           %Craft supports going up or down 
+       FullNoPropulsion(2),          %Craft supports full horizontal/vertical manuevering, whitout own source of propulsion
+       FullPropulsionGliding(3),     %Craft supports full horizontal/vertical manuevering, own propulsion, non stop movement
+       FullPropulsionVTOL(4),        %Craft supports full horizontal/vertical manuevering, own propulsion, stop movement enabled 
     end
     
     methods(Static)

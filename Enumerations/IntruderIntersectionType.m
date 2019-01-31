@@ -1,14 +1,13 @@
 classdef IntruderIntersectionType < uint32
-    %MOVEMENTTYPE Summary of this class goes here
-    %   Detailed explanation goes here
+    %IntruderIntersectionType Type of intruder intersection with avoidance grid
     enumeration
-        Time(0),
-        FutureMovements(1),
-        Ball(2),
-        Spread(3),
-        OnlySpread(4),
-        NonCooperative(5),
-        Cooperative(6),
+        Time(0),              %Use time of arival intersection mode
+        FutureMovements(1),   %Use future movements prediction (Enforces behind craft avoidance)
+        Ball(2),              %consider body volume in intersection, needs a parameter in map
+        Spread(3),            %Consider manuevurability uncertainity
+        OnlySpread(4),        %Neglect other behaviour except manuevurability
+        NonCooperative(5),    %Spread+body+future movements - worst case intersection
+        Cooperative(6),       %Line+body+timed - avearage case intersection
     end
     
     methods(Static)
@@ -17,6 +16,8 @@ classdef IntruderIntersectionType < uint32
         end
         
         function r=getIntersectionConfig(enums)
+            %Generates Intersection Config object based on options listing,
+            %   enums - enumeration member unique list [1..*]
             r = IntersectionConfig();
             if nargin ~= 0
                 r.flagTimeIntersection = false;    %Enforce time

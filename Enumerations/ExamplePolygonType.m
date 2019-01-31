@@ -1,13 +1,13 @@
 classdef ExamplePolygonType<uint32
     %Example polygons collection for polyconstraint
-    %   Detailed explanation goes here
+
     
     enumeration
-        Unusual(1), % see poly static constraint
-        PentaTrap(2),
-        Hospital(3),
-        Square(4),
-        Poly5(5),
+        Unusual(1),             % see poly static constraint
+        PentaTrap(2),           % Pentagon hollow trype
+        Hospital(3),            % H-shaped buildng
+        Square(4),              % Square with even side
+        Poly5(5),               % 5 vertex convex polygon
     end
     
     methods(Static)
@@ -15,8 +15,11 @@ classdef ExamplePolygonType<uint32
             r=char(member);
         end
         
-        %gets polygon data scaled to 1, with centering at 0.0
+        
         function r=getPolygonData(member)
+            %gets polygon data scaled to 1, with centering at 0.0
+            
+            
             %unusual building r=5
             if member == ExamplePolygonType.Unusual
                 r=[-4,3;4,3;4,-3;2,-3;2,0;0,0;0,-3;-4,-3;-4,-1;-2,-1;-2,2;-4,2;-4,3]'./5;

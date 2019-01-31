@@ -1,12 +1,11 @@
 classdef ResolutionType<uint32
-    %RESOLUTIONTYPE Summary of this class goes here
-    %   Detailed explanation goes here
+    %RESOLUTIONTYPE Collision Case resolution type sent in resolution message to UAS
     
     enumeration
-        StayOnCourse(1),
-        RightSideAvoidance(2),
-        RoundaboutAvoidance(3),
-        EmergencyAvoidance(4),
+        StayOnCourse(1),            %UAS has Right of the waym stay on original heading, until avoidance is compled
+        RightSideAvoidance(2),      %UAS must avoid collision point from right side, keep velocity
+        RoundaboutAvoidance(3),     %UAS must joint and follow roundabout
+        EmergencyAvoidance(4),      %UAS is enforced into emergency mode (Every UAS for itself ...)
     end   
     
     methods(Static)
