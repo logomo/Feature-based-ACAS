@@ -1,3 +1,4 @@
+%% Development of the rule engine setup
 obj = RuleEngine();
 % add some rule codes to joint point
 obj.activateRules(RuleJointPoint.MissionControlRunOnce,[...

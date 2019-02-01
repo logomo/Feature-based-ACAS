@@ -1,3 +1,4 @@
+%% Misiso0n control - scenario - side hit multiple
 clear
 %test waypoints
 waypoints = [Waypoint(0,0,0),Waypoint(55,0,0)];

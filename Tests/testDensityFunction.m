@@ -1,3 +1,4 @@
+%% Calculate minimal reading density to detect an obstacle with 100 percent probability
 ag=AvoidanceGrid(0,10,-pi/4,pi/4,-pi/6,pi/6,10,7,5);
 s=0;
 for k=1:7

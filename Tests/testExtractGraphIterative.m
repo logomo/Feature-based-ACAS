@@ -1,3 +1,4 @@
+%% Grahp Reach set implementaiton - iterative approach
 %Avoidance/Navigation grid 
 gridDistance=10;
 gridHorizontalRange=pi/4;

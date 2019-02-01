@@ -1,3 +1,4 @@
+%% Rule right plane heading verbose
 utm=utmControl;
 cc=utm.createCollisionCase(1,2);
 firstId=cc.firstId;

@@ -1,3 +1,4 @@
+%% Scenario - static obstacle avoidance
 clear
 
 navigationType=ReachSetCalculation.ACASLike;

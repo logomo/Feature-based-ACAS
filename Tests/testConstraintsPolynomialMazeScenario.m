@@ -1,3 +1,4 @@
+%% Scenario maze - early version
 clear
 
 navigationType=ReachSetCalculation.ACASLike;

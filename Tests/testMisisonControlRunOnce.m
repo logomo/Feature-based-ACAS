@@ -1,3 +1,4 @@
+%% Misiso0n control - scenario - run once - run after initialzation of other mission control scenarios
 %%Waypoint check logic
 [obj.finalWaypointReachedFlag,obj.waypointReachedFlag]=obj.checkAndSetObjective;
 obj.obstacleFlag=0;

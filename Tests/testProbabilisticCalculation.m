@@ -1,3 +1,4 @@
+%% Raw development of reach set 
 %Create testing grid
 clear
 farCount = 8; % spread 8 trajectories far away from center

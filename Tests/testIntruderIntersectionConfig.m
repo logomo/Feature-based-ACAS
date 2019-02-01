@@ -1,3 +1,4 @@
+%% Test interesction config enumeration possibilities
 all=IntruderIntersectionType.getIntersectionConfig([IntruderIntersectionType.Time,IntruderIntersectionType.Ball,IntruderIntersectionType.Spread,IntruderIntersectionType.OnlySpread,IntruderIntersectionType.FutureMovements]);
 cooperative=IntruderIntersectionType.getIntersectionConfig(IntruderIntersectionType.Cooperative)
 noncooperative=IntruderIntersectionType.getIntersectionConfig(IntruderIntersectionType.NonCooperative)

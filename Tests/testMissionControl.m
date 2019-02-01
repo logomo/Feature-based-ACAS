@@ -1,3 +1,4 @@
+%% Misiso0n control - scenario - static obstacles
 clear
 %test waypoints
 waypoints = [Waypoint(0,0,0),Waypoint(20,0,0),Waypoint(20,20,0),Waypoint(0,20,0),Waypoint(0,0,10)];

@@ -1,4 +1,4 @@
-%%Constraindes expansion algorithm
+%% Constraindes expansion algorithm
 lm=LinearizedModel;
 
 %Set up separations (TODO Cmnf configuration item)

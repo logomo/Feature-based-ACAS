@@ -1,3 +1,4 @@
+%% Intruder as a obstacle scenario
 clear
 
 %First vehicle

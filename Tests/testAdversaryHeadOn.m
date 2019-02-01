@@ -1,3 +1,4 @@
+%% Emergeny head on scenario prototype
 clear
 
 %Avoidance setup

@@ -1,3 +1,4 @@
+%% 2D eclipse intersection with Avoidance grid, used in Spread intersection intruder model
 clear;
 position = [6;8;0];
 velocity=[0;-1;0];

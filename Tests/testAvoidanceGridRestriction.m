@@ -1,3 +1,4 @@
+%% Simple avoidance grid restriction rule
 utm=utmControl;
 cc=utm.createCollisionCase(1,2);
 firstId=cc.firstId;

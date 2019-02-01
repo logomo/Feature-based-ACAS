@@ -1,3 +1,4 @@
+%% TEST CASE nice plot of vehicle
 state=State(0,0,0,0,0,0, 1);
 vehicle=Vehicle(state);
 figure(1)

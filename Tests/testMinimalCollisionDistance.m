@@ -1,3 +1,4 @@
+%% Calculate collision point and indicators, reused from other paper
 %Common function based on proceedings from:
 %http://sections.maa.org/lams/proceedings/spring2001/bard.himel.pdf
 p1=[20;0;0];

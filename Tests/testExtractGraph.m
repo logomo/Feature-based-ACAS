@@ -1,3 +1,4 @@
+%% Recursice approach to graph extraction from Reach set
 %Avoidance/Navigation grid 
 gridDistance=10;
 gridHorizontalRange=pi/4;

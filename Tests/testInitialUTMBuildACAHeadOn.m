@@ -1,3 +1,4 @@
+%% ACAS head on two UAS scenario
 clear
 
 navigationType=ReachSetCalculation.Harmonic;

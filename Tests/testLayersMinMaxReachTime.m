@@ -1,3 +1,4 @@
+%% Layer entry/leave time calculation prototype
 farCount = 8; % spread 8 trajectories far away from center
 nearCount = 1; % spread 1 trajectory close to cell center
 ag=AvoidanceGrid(0,20,-pi/4,pi/4,-pi/6,pi/6,20,7,5);

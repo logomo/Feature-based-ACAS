@@ -1,3 +1,4 @@
+%% Statistics test
 figure(1)
 obj.plotObstacletoDistanceStatistic;
 figure(2)

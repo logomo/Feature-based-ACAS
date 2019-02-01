@@ -1,3 +1,4 @@
+%% Collision case eraly creation script 
 obj=utmControl;
 fid=1;
 sid=2;

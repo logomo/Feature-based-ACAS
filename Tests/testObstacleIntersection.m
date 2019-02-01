@@ -1,4 +1,5 @@
-%Mission control object must exist
+%% TEST - Obstacle intersection
+%%Mission control object must exist
 [intersections,collisions]=getIntersectionCollisionCandidates(obj);
 obj.avoidanceGrid.resetGrid
 

@@ -1,3 +1,4 @@
+%% Test aligh to the vector LCF function
 clear;
 
 

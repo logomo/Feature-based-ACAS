@@ -1,3 +1,4 @@
+%% Collision case calculation prototype
 clear
 
 %First vehicle

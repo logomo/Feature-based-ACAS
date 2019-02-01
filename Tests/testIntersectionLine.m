@@ -1,3 +1,4 @@
+%% Line intersection test implementaiton prototype
 ag=AvoidanceGrid(0,10,-pi/4,pi/4,-pi/6,pi/6,10,7,5);
 cellMap=[];                                                     
 for k= 1:length(ag.layers)

@@ -1,3 +1,4 @@
+%% Static constraint development test
 %obj=BarrelConstraint([0,0],5);
 %obj.plot;
 

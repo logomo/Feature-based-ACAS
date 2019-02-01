@@ -1,3 +1,4 @@
+%% Misiso0n control - scenario - many intruders
 clear
 %test waypoints
 waypoints = [Waypoint(0,0,0),Waypoint(25,0,0)];

@@ -1,3 +1,4 @@
+%% Rule right plane heading trigger raw script 
 utm=utmControl;
 cc=utm.createCollisionCase(1,2);
 firstId=cc.firstId;

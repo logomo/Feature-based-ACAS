@@ -1,3 +1,4 @@
+%Scenario - trap avoidance (This has not been proven in thesis, but it works yeah ...)
 clear
 
 navigationType=ReachSetCalculation.ACASLike;
