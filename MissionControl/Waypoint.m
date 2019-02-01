@@ -1,13 +1,16 @@
 classdef Waypoint<handle
-    %WAYPOINT Summary of this class goes here
-    %   Detailed explanation goes here
+    %WAYPOINT coating function to represent waypoinnt as object
     
     properties
-        position=[0;0;0];
+        position=[0;0;0];   %Local position
     end
     
     methods
         function obj=Waypoint(x,y,z)
+            %Waypoint constructor 
+            %   x - GCF x
+            %   y - GCF y
+            %   z - GCF z
             if nargin ==1
                 obj.position=x;
             end

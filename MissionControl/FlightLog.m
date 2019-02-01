@@ -1,37 +1,39 @@
 classdef FlightLog<LoggableObject
-    %FLIGHTLOG Summary of this class goes here
-    %   Detailed explanation goes here
+    %FLIGHTLOG Wrapper class to log flight status over mission control timeframes
     
     properties
         %Common information
-        simulationTime;
+        simulationTime;             % Time of the simulation
         %Vehicle information
-        vehiclePosOrBefore
-        executedMovement
-        vehiclePosOrAfter
-        movementBuffer
+        vehiclePosOrBefore          % Before movement applicaiton pos XYZ  GCF
+        executedMovement            % Movement type applied this frame
+        vehiclePosOrAfter           % After movement application pos XYZ GCF
+        movementBuffer              % State of movement buffer [list of existing movements]
         %Mission information
-        waypointID
-        waypoint
+        waypointID                  % Actual goal waypoint ID
+        waypoint                    % Actual goal XYZ GCF
         %Obstacle information
-        intersections
-        obstacleHits
-        staticObstacleFlag
-        %Intruder information
-        detectedIntruders
-        intruderHits
-        intruderFlag
+        intersections               % static obstacle intersected cells
+        obstacleHits                % count of lidar hits
+        staticObstacleFlag          % indication if static obstacle was encountered in this frame
+        %Intruder information       
+        detectedIntruders           % list of detected intruders
+        intruderHits                % List of cells where intruders can intersect
+        intruderFlag                % indicaiton if intruder was entcountered this time frame
         %Mission flags
-        waypointReachedFlag
-        waypointUnreachableFlag
-        finalWaypointReachedFlag
-        collisionFlag
-        obstacleFlag
-        forcerReplaningFlag
+        waypointReachedFlag         % indicaiton if goal waypoint has been reached this time
+        waypointUnreachableFlag     % indication if goal waypoint has been marked as unreachable this time frame
+        finalWaypointReachedFlag    % indicaiton if last mission waypoint has been reached this time frame
+        collisionFlag               % indication if collision happened this time frame
+        obstacleFlag                % indication if obstacle collision happened in this frame
+        forcerReplaningFlag         % indicaiton if event forcing replaning of trajectory was raised
     end
     
     methods
         function showMissionStatus(obj)
+            % Formatted console output to show mission status
+            %   - usage for debug,
+            %   - refer to Cmnf.logc function
             Cmnf.logc(obj,['Mission status time: ',mat2str(obj.simulationTime),' s']);
             %Vehicle information
             Cmnf.logc(obj,'>> Vehicle status:');

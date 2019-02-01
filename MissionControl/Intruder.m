@@ -1,6 +1,5 @@
 classdef Intruder<handle
-    %INTRUDER Summary of this class goes here
-    %   Detailed explanation goes here
+    %INTRUDER Mission control non cooperative intruder data structure (ADS-B like message)
     
     properties
         id                                      %  identification number of intruder;
@@ -15,6 +14,7 @@ classdef Intruder<handle
     
     methods
         function obj=Intruder(localPosition,localVelocity,detectionTime)
+            %Constructor to create object
             obj.localPosition=localPosition;
             obj.localVelocity=localVelocity;
             obj.detectionTime=detectionTime;
@@ -22,10 +22,12 @@ classdef Intruder<handle
         
         %flagFunction 
         function r=isFirstDetection(obj,simulationTime)
+            %Check if intruder is known or it was detected first time
             r=obj.detectionTime == simulationTime;
         end
         
         function r=isDetected(obj,simulationTime)
+            %Check if intruder has been detected by sensor
             mint =obj.detectionTime;
             maxt =obj.detectionTime+obj.liveTime;
             r= mint<=simulationTime && maxt >= simulationTime;
@@ -33,6 +35,7 @@ classdef Intruder<handle
         
         %singleIntruderPlot
         function plotTimedTrajectory(obj,simTime)
+            %Plot function for mission control enviroment
             posTime=obj.posTime;
             time=posTime(4,:);
             indexes = find(time<=simTime);
