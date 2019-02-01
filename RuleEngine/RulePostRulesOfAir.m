@@ -3,7 +3,7 @@ classdef RulePostRulesOfAir<AbstractRule
     %   Gets all spoils and constraints
     
     properties
-        MissionControl          %UAS mission control object reference
+        missionControl          %UAS mission control object reference
         vehicleId               %UAS UQ ID
         vehicleName             %UAS name
         activeCollisionCases    %Listiong of active collision cases related to UAS

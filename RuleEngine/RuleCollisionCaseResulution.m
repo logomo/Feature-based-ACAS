@@ -3,7 +3,7 @@ classdef RuleCollisionCaseResulution<AbstractRule
     %   Use this template for your own implementation
     
     properties
-        MissionControl          %Mission control reference
+        missionControl          %Mission control reference
         vehicleId               %UAS uq ID
         vehicleName             %UAS name
         activeCollisionCases    %Listing of active Collision cases
