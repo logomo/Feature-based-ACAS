@@ -1,6 +1,5 @@
 classdef VehiclePositionNotification<handle
-    %VEHICLEPOSITIONNOTIFICATION Summary of this class goes here
-    %   Detailed explanation goes here
+    %VEHICLEPOSITIONNOTIFICATION refer to section 6.5, the position notification wrapper class 
     
     properties
         %position
@@ -32,12 +31,12 @@ classdef VehiclePositionNotification<handle
     end
     
     methods
-        %Constructor methodr
-        %   pos - position gloc
-        %   or - orientation gloc
-        %   vel - velocity gloc
-        %   sm - universal safety margin
         function obj=VehiclePositionNotification(pos,or,vel,sm)
+            %Constructor methodr
+            %   pos - position gloc
+            %   or - orientation gloc
+            %   vel - velocity gloc
+            %   sm - universal safety margin
             obj.latitude=pos(1);                                               
             obj.longitude=pos(2);                                              
             obj.altitude=pos(3);
@@ -46,16 +45,18 @@ classdef VehiclePositionNotification<handle
             obj.smUniversal=sm;
         end
         
-        % Gets position vector
-        %   r = lat/lon/alt [m,m,m] (imperial units only in spec xo xo xo)
+        
         function r=getPosition(obj)
+            % Gets position vector
+            %   r = lat/lon/alt [m,m,m] (imperial units only in spec xo xo xo)
             r=[obj.latitude;obj.longitude;obj.altitude];
         end
         
-        % Gets safety margin
-        % IN   colCat CollisionCategory enumeration member
-        % OUT  r - safety margin for given situation [m]
+        
         function r=getSafetyMargin(obj,colCat)
+            % Gets safety margin
+            % IN   colCat CollisionCategory enumeration member
+            % OUT  r - safety margin for given situation [m]
             if nargin <2
                 colCat = CollisionCategory.Unknown;
             end
@@ -84,10 +85,11 @@ classdef VehiclePositionNotification<handle
                 return;
             end
         end
-        % Helper function all safety margins coupled as vector for minmax
-        % functions
-        %   r - vector [m,m,m,m,m,m,m,m,m,m,....]
+        
         function r=getSafetyMarginVector(obj)
+            % Helper function all safety margins coupled as vector for minmax
+            % functions
+            %   r - vector [m,m,m,m,m,m,m,m,m,m,....]
             r=[obj.smUniversal;obj.smOvertake;obj.smConverging;obj.smHeadOn;obj.wakeConeDiameter];
         end
     end

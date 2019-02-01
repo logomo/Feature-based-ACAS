@@ -1,19 +1,19 @@
 classdef UTMControl<RullableObject
-    %UTMCONTROL Summary of this class goes here
-    %   Detailed explanation goes here
+    %UTMCONTROL Refer to 6.5,6.6 sections of the thesis
     
     properties
-        actualDecisionFrame=0;
-        vehicleCount=0;
-        missionControls=[];
-        positionNotifications=[];
+        actualDecisionFrame=0;              %The UTM time
+        vehicleCount=0;                     %Count of registered UAS in the controlled sector
+        missionControls=[];                 %List of mission control object references
+        positionNotifications=[];           %List of valid position notifications in actual decision frame
         %flags
-        showStatFlag=[];
-        collisionCases=containers.Map;
+        showStatFlag=[];                    %[Helper] List of statistical flags to show grid slice plots for specific missions
+        collisionCases=containers.Map;      %Collision cases register
     end
     
     methods
         function obj=UTMControl()
+            %Constructor - initializes empty airspace
             obj.actualDecisionFrame=0;
             obj.vehicleCount=0;
             obj.missionControls=[];
@@ -24,6 +24,9 @@ classdef UTMControl<RullableObject
         end
         %% Add vehicle into mission Control
         function r=registerMission(obj,missionControl,statFlag)
+            % UAS is registered when entering the controlled space segment
+            %   missionControl - reference to mission control object (in reality all MC calls are realized trough C2 link)
+            %   statFlag - [helper] plot the parameters of the avoidance/obstacle/visibility grids (true for one UAS only, debug only)
             if nargin<2
                 statFlag=false;
             end
@@ -39,6 +42,7 @@ classdef UTMControl<RullableObject
         
         %% Active mission Count
         function r=activeMissionsCount(obj)
+            %[Sanity] Check status of each mission and returns the integer count of active missions
             r=0;
             for ms=obj.missionControls
                 if ms.isActive
@@ -49,6 +53,8 @@ classdef UTMControl<RullableObject
         
         %% runSimulations
         function r=runSimulations(obj,withPlot)
+            %Run one timeframe simulations,
+            %   withPlot - flag  indicating if situation overview should be showed (default - true)
             if(nargin < 2)
                 withPlot=true;
             end
@@ -103,7 +109,9 @@ classdef UTMControl<RullableObject
         
         %% Create collision Case
         function r=createCollisionCase(obj,fid,sid)
-            %Create and fill collision case object
+            %Create and fill collision one case object
+            %   fid - UAS 1 UQ ID
+            %   sid - UAS 2 UQ ID
             cc=CollisionCase;
             fmc= obj.missionControls(fid);
             smc= obj.missionControls(sid);
@@ -377,10 +385,12 @@ classdef UTMControl<RullableObject
         end
         %% Create collision case hash
         function r=hashCollisionCase(obj,firstId,secondId)
+            %[Helper] creates unique string ID for internal map representation
             r=['CollisionCase ','firstId: ',mat2str(firstId),' - secondId: ',mat2str(secondId)];
         end
         %% Select collision case based on Hash
         function r=selectColissionCase(obj,firstId,secondId)
+            %[Helper]Load collision case tip from the internal map based on UAS UQ IDs
             hash=obj.hashCollisionCase(firstId,secondId);
             existKeyFlag=obj.collisionCases.isKey(hash);
             if existKeyFlag
@@ -392,6 +402,7 @@ classdef UTMControl<RullableObject
         
         %% Select collision cases for id
         function r=selectCollisionCases(obj,vehicleID)
+            %[Helper] Returns a list of collision cases for one UAS based on it UQ ID
             r=[];
             for k=1:length(obj.missionControls)
                 mc=obj.missionControls(k);
@@ -408,6 +419,7 @@ classdef UTMControl<RullableObject
         
         %% Link collision case 
         function r=linkCollisionCase(obj,collisionCase)
+            %[Helper] links the new collision case to the tip 
             if (~isobject(collisionCase))||~strcmp(class(collisionCase),'CollisionCase')
                 r=-1; % return codes everywhere
                 return
@@ -443,6 +455,7 @@ classdef UTMControl<RullableObject
        
         %% Create collision Cases
         function r=createCollisionCases(obj)
+            %Compares each to each UAS trajectories and creates a collision cases if there is any
             for k=1:(length(obj.missionControls) - 1)
                 if (obj.missionControls(k).isActive)
                     Cmnf.logc(obj,['[Collision cases] Mission id: ' ,mat2str(k), ' vehicleName: '...
@@ -471,6 +484,7 @@ classdef UTMControl<RullableObject
         %% showCollisionCaseTrace % debuf function
         % utmControl.showCollisioncaseTrace(1,2,1)
         function r=showCollisioncaseTrace(obj,firstId,secondId,depth)
+            %[Debug] Rolling log showing collision case
             if nargin == 3
                 depth=inf;
             end
@@ -498,6 +512,7 @@ classdef UTMControl<RullableObject
         
         %% Rule engine create context (DO NOT CALL DIRECTLY)
         function r=createContextRuleEngine(obj)
+            %[Override] Creates context to the rule engine
             createContextRuleEngine@RullableObject(obj);
             obj.reContext('utmControl')=obj;
             r=obj.reContext;
@@ -505,6 +520,7 @@ classdef UTMControl<RullableObject
         
         %% Rule engine injection method
         function r=injectRuleEngine(obj,ruleEngine)
+            %[Overide] injects Rule engine into underlaying structures
             masterFlag=injectRuleEngine@RullableObject(obj,ruleEngine);
             % TODO injection body
             mcs=obj.missionControls;
