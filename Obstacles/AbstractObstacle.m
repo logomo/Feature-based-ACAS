@@ -14,10 +14,12 @@ classdef AbstractObstacle<LoggableObject
     methods
         %% Common methods
         function r=getPoints(obj)
+            %Returns points for obstacle
             r=obj.points;
         end
         
         function r=getColor(obj)
+            %Returns color of obstacle
             r=[1,1,1];
             if obj.type == ObstacleType.Detected
                r=[1 0 0]; 
@@ -28,16 +30,19 @@ classdef AbstractObstacle<LoggableObject
         end
         
         function r=isCollision(obj,position)
+            %Default collision check with UAS at position
             distance=norm(obj.center-position,2);
             r = distance <= obj.collisionRange;
         end
         
         function r=isIntersection(obj,position,visibilityFieldRange)
+            %Is there an intersection with visible world ?
             distance=norm(obj.center-position,2)-obj.intersectionRange;
             r = distance <= visibilityFieldRange;
         end
         
         function plot(obj)
+            %Default plot function for obstacle as set of points
             [m,n]=size(obj.points);
             hold on
             plot3(obj.center(1),obj.center(2),obj.center(3),'Marker','o','MarkerFaceColor',obj.getColor,'MarkerEdgeColor',[0 0 0]);
