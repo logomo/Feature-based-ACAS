@@ -4,73 +4,88 @@ classdef MissionControl<RullableObject
     
     properties
         %Mission data
-        waypoints
-        goal=[0;0;0];
-        waypointID=0;
-        maxWaypointID;
-        waypointReachedFlag=0;
-        waypointUnreachableFlag=0;
-        finalWaypointReachedFlag=0;
-        collisionFlag=0;
-        ruleFlag=false;
+        waypoints                                                           % List of waypoints
+        goal=[0;0;0];                                                       % Actual goal XYZ GCF
+        waypointID=0;                                                       % Active waypoint ID
+        maxWaypointID;                                                      % Count of waypoints
+        waypointReachedFlag=0;                                              % Indication if waypoint was reached in this decision frame
+        waypointUnreachableFlag=0;                                          % Indication if waypoint was evaluated as unreachable in this decision frame
+        finalWaypointReachedFlag=0;                                         % Indication if last mission waypoint has been reached in this decision frame
+        collisionFlag=0;                                                    % Indication if collision occured in this decision frame
+        ruleFlag=false;                                                     % Indication if any rule requiring a event handling has been fired in this decision frame
         
         %Vehicle data
-        vehicle
-        movementBuffer
-        vehicleName
-        vehicleId=0;
-        vehicleActualVelocity=1;  %set for 1 m/s for sake of simplicity TODO:mechanism of velocity change
-        vehicleSafetyMargin=0; % set vehicleSafetyMargin
-        vehicleCategory=VehicleCategory.UAVAutonomous;
-        vehicleManCat =ManeuverabilityCategory.FullPropulsionGliding;
+        vehicle                                                             % UAS Vehicle object handle - the data structure representing controlled vehicle
+        movementBuffer                                                      % Planned movements to be executed by UAS vehicle
+        vehicleName                                                         % Human readable name of UAS
+        vehicleId=0;                                                        % UQ ID used to identify the UAS in the UTM ennviroment - refer to USPACE 1st phase
+        vehicleActualVelocity=1;                                            % set for 1 m/s for sake of simplicity TODO:mechanism of velocity change
+        vehicleSafetyMargin=0;                                              % set vehicleSafetyMargin
+        vehicleCategory=VehicleCategory.UAVAutonomous;                      % UAS ICAO classifcation
+        vehicleManCat =ManeuverabilityCategory.FullPropulsionGliding;       % UAS manuevurability category used in collision case calculation
         
         %Obstacle data
-        intruders=[];
-        intruderId=1;
-        staticObstacleID=1;
-        staticObstacles=[];
-        constraintID=1;
-        constraints=[];
-        activeSHCostraints = [];
-        staticObstacleFlag=0;
-        intruderFlag=0;
-        obstacleFlag=0;
-        hardConstraintFlag=false;
-        softConstraintFlag=false;
-        forcerReplaningFlag=0;
+        intruders=[];                                                       % List of active ADS-B messages received by UAS system MissionControl\Intruder class                                                 
+        intruderId=1;                                                       % [Implementation] Intruder counter
+        staticObstacleID=1;                                                 % [Implementation] Static obstacle counter
+        staticObstacles=[];                                                 % Set of active static obstacles, including map obstacles from obstacle map  
+        constraintID=1;                                                     % [Implementation] Contraint counter 
+        constraints=[];                                                     % Contstraints including soft/hard, static/moving - from IS or DB
+        activeSHCostraints = [];                                            % List of active constraints within avoidance grid range
+        staticObstacleFlag=0;                                               % Indication if static obstacle have been encountered this decision frame
+        intruderFlag=0;                                                     % Indication if intruder have been encountered this decision frame
+        obstacleFlag=0;                                                     % Indication if any physical obstacle have been encountered this decision  frame
+        hardConstraintFlag=false;                                           % Indication if any hard constraints have intersected the avoidance grid in this decision frame
+        softConstraintFlag=false;                                           % Indication if any soft constraints have intersected the avoidance grid in this decision frame
+        forcerReplaningFlag=0;                                              % Indication if any event forcing replaning occured in this timeframe
         
         %Navigation grid
-        navigationGrid
-        navigationType
-        navigationParams
+        navigationGrid                                                      %Avoidance Grid instance used for navigation reference to objet
+        navigationType                                                      %Reach set approximation type used for navigation
+        navigationParams                                                    %Avoidance grid parameters container.Map instance used for navigation
         
         %Avoidance grid
-        avoidanceGrid
-        avoidanceType
-        avoidanceParams
+        avoidanceGrid                                                       %Avoidance Grid instance used for emergency avboidance, object refrence
+        avoidanceType                                                       %Reach set approximation type used for emergency avoidance                                                    
+        avoidanceParams                                                     %Avoidance grid parameters container. Map instance used for navigation
         
         %Adversarial intersection model
-        flagTimeIntersection = 0;    %Enforce time
-        flagFutureMovements = 0;     %Enforce future movements
-        flagBallIntersection = 0;    %Enforce ball intersection
-        flagSpread = 0;              %Use spread
-        flagOnlySpread = 0;          %DO not Use line intersection
+        flagTimeIntersection = 0;                                           %Default intruder intersection settings - Enforce time
+        flagFutureMovements = 0;                                            %Default intruder intersection settings - Enforce future movements
+        flagBallIntersection = 0;                                           %Default intruder intersection settings - Enforce ball intersection
+        flagSpread = 0;                                                     %Default intruder intersection settings - Use spread
+        flagOnlySpread = 0;                                                 %Default intruder intersection settings - DO not Use line intersection
         
         %Plot parameters
-        trajectoryColor='b';
-        plannedColor='r';
-        lastTrajectoryPlotHandles=[];
-        actualTrajectoryPlotHandles=[];
-        enableRasterRange = false;
+        trajectoryColor='b';                                                %Plot - the flew trajectory color - plane body shares it
+        plannedColor='r';                                                   %Plot - the planned trajectory collor
+        lastTrajectoryPlotHandles=[];                                       %[Helper] Plot - list of plot handles for movement illusion
+        actualTrajectoryPlotHandles=[];                                     %[Helper] Plot - list of plot handles for actual time frame to create movement illusion
+        enableRasterRange = false;                                          %Plot - show raster range while moving to denote active operational/decision area
         %SimulationParameters
-        simulationTime=0;
-        avoidanceRunDuration=[];
-        missionLog=[];
+        simulationTime=0;                                                   %Actual decision frame initial time
+        avoidanceRunDuration=[];                                            %Heuristic data to measure avoidance run decision frame occupancy
+        missionLog=[];                                                      %List of mission events logged in main mission run
     end
     
     methods
         %% Constructor
         function obj=MissionControl(waypoints,position,orientation,gridDistance,gridHorizontalRange,gridVerticalRange,gridHorizontalCount,gridVerticalCount,navigationType,navigationParams,avoidanceType,avoidanceParams)
+            %Constructor, initializes mission control object with UAS vehicle and avoidance/navigaiton grid + mission POI
+            %   waypoints - the set of ordered MissionControl\waypoint objects
+            %   position - GCF 3D point
+            %   orientation - GCF 3D initial uas roll,pitch,yaw
+            %   gridDistance - avoidance grid distance range
+            %   gridHorizontalRange - avoidance grid horizontal angle range
+            %   gridVerticalRange - avoidance grid vertical angle range
+            %   gridHorizontalCount - horizontal layers count
+            %   gridVerticalCount - vertical layers count
+            %   navigationType - reach set approximation type for naviation
+            %   navigationParams - parameters for selected RSA type
+            %   avoidanceType, - reach set approximation tyep for avoidance
+            %   avoidanceParams - parameters for selected RSA type
+            
+            
             % Default values for reach set calculations and parameters
             if (nargin == 8)
                 navigationType=ReachSetCalculation.Harmonic;
@@ -134,6 +149,8 @@ classdef MissionControl<RullableObject
         
         %% Simulation function
         function runOnce(obj,showStatFlag)
+            %[Internal] One timeframe run (look after 6.5.3) in thesis for complete documentation
+            %   showStatFlag - true/false - show reachibility, visibility, obstacle rating in figures 2,3,4 (change in Common/Cmnf)
             logStrartTime = clock;
             %Show status performance of navigation/avoidance grid for this
             %instance ?
@@ -319,6 +336,9 @@ classdef MissionControl<RullableObject
         end
         
         function runOnceWithPlot(obj,f,showStats)
+            %[Graphic]Simulation function wrapper (6.5.3 in thesis) Mission control run with plot
+            %   f - int reference for figure where the content should be put
+            %   showStatFlag - true/false - show reachibility, visibility, obstacle rating in figures 2,3,4 (change in Common/Cmnf)   
             if nargin == 1
                 f=1;
                 showStats=false;
@@ -337,6 +357,7 @@ classdef MissionControl<RullableObject
         
         %% waypoint reach methods
         function r=testWaypointReach(obj)
+            %Checks waypoint reach condition based on situation, returns boolean evalation
             vehicle=obj.vehicle;
             posOr=vehicle.getActualPositionOrientation();
             pos=posOr(1:3);
@@ -351,6 +372,9 @@ classdef MissionControl<RullableObject
         end
         
         function [finalFlag,reachTest]=checkAndSetObjective(obj)
+            %Checks and test waypoint status, returns a flag list 
+            %   (out) finalFlag - boolean indicaiton if final waypoint has been reached
+            %   (out) reachTest - boolean indication if goal waypoint has been reached
             finalFlag=false;
             if obj.waypointID ==0
                 Cmnf.logc(obj,'Loading first waypoint');
@@ -379,6 +403,8 @@ classdef MissionControl<RullableObject
         end
         
         function r=checkForcedPathReplaning(obj)
+            %Checks conditions and events for forcer derplaning 
+            %   r - boolean indication if forced replaning is necessary 
             avoidanceGridEnd=obj.avoidanceGrid.dEnd;
             vehiclePosition = obj.vehicle.getActualPositionOrientation;
             vehiclePosition=vehiclePosition(1:3);
@@ -389,6 +415,11 @@ classdef MissionControl<RullableObject
         end
         %% Goal finding methods
         function [bestTrajectory,waypointUnreachableFlag,collisionFlag]=findBestPath(obj,ag)
+            % [Avoidance Grid Run]Find best trajectory in avoidance grid, using standard outer layer path search, (see 6.5.1 Avoidance Run)
+            %   (out) bestTrajectory - the best trajectory tip, found by this algorithm after situation assessment 
+            %   (out) waypointUnreachableFlag - boolean indication if waypoint is unreachable (waypoint cell in avoidance grid is unreachable)
+            %   (out) collisionFlag - there is no turn back trajectory you will crash (always false for static obstacle projection)
+            %   ag - avoidance/navigation grid where the path should be searched 
             bestTrajectory=0;
             localGoal=obj.getLocalCoordiantes(obj.goal);
             intersectionCell=ag.getCellEuclidian(localGoal);
@@ -444,7 +475,14 @@ classdef MissionControl<RullableObject
             end
 
         end
+        
+        
         function candidateCell=findBestCellOnLayer(obj,ag,layerIndex,maxLayerIndex)
+            %Gets best cell on distance layer, depending on the goal waypoiint position and cells reachibility
+            %   (out) candidateCell - the best cell on referenced layer, containing at least one feasible trajectory
+            %   ag - avoidance/navigation grid reference where to search
+            %   layerIndex - distance layer where to searhc
+            %   maxLayerIndex - last layer of active zone [DEPRECATED/Implementation fail]
             if nargin == 3
                 maxLayerIndex=layerIndex;
             end
@@ -485,6 +523,9 @@ classdef MissionControl<RullableObject
         end
         
         function bestTrajectory=findBestTrajectoryInCell(obj,candidateCell)
+            % Finds best trajectory (energy const wise) in given cell, which is safe/feasible.
+            %   (out) bestTrajectory - the safe cost effective trajectory tip
+            %   candidateCell - AvoidanceGrid/GridCell structure
             trajectories=candidateCell.trajectories;
             Cmnf.logc(candidateCell,['Searching best trajectory in cell: ',mat2str(candidateCell.ijkIndex),...
                                      ' going trough ',mat2str(length(trajectories)),' trajector(y/ies)']);
@@ -508,6 +549,8 @@ classdef MissionControl<RullableObject
         % Put obstacle into obstacle register
         %   obstacles - list of AbstractObstacleObject
         function r=putObstacles(obj,obstacles)
+            % Put obstacles into detected obstacle register
+            %   obstacles - list of obstacles AbstractObstacle LiDAR readings 
             for k=1:length(obstacles)
                 obstacles(k).id=obj.staticObstacleID;
                 obj.staticObstacleID=obj.staticObstacleID+1;
@@ -523,6 +566,9 @@ classdef MissionControl<RullableObject
         end
         
         function [intersections,collisions]=getIntersectionCollisionCandidates(obj)
+            %Calculates intersections and collisions with static and map obstacles
+            %   intersections - list of obstacles in avoidance grid
+            %   collisions -    list of obstacles in collision zone - this must be empty  for static obstacles
             intersections=[];
             collisions=[];
             posOr=obj.vehicle.getActualPositionOrientation;
@@ -541,6 +587,9 @@ classdef MissionControl<RullableObject
         end
         
         function r=intersectObstaclesWithGrid(obj,ag,intersections)
+            %[Iterator] Put all obstacles intersections into Avoidance Grid
+            %   ag - avoidance/navigation grid to be intersected
+            %   intersections - list of impacting obstacles from map or lidar reading
             r=0;
             for intersection=intersections
                 r=r+obj.intersectObstacleWithGrid(ag,intersection);
@@ -548,6 +597,9 @@ classdef MissionControl<RullableObject
         end
         
         function r=intersectObstacleWithGrid(obj,ag,intersection)
+            %[Iterator] Put single obstacle into grid
+            %   ag - avoidance/navigation grid to be intersected
+            %   intersection - one of impacting obstacles from map or lidar reading
             r=0;        
             globPoints=intersection.getPoints;
             locPoints =obj.getLocalCoordiantes(globPoints);
@@ -562,6 +614,8 @@ classdef MissionControl<RullableObject
         end
         
         function r=calculateDistanceToObstacleStatistic(obj)
+            %[Helper] calculate distance to obstacle from vehicle position
+            %   (out) r = list of distances corresponding to the list of known obstacles from map/lidar
             recordCount=length(obj.missionLog);
             time =  zeros(1,recordCount);
             position = zeros(3,recordCount); 
@@ -587,6 +641,8 @@ classdef MissionControl<RullableObject
         end
         %% Intruder functions
         function r=addIntruder(obj,intruder)
+            % Register one ADS-B message into the register
+            %   intruder - AbstractAdversary implementaiton
             intruder.id=obj.intruderId;
             obj.intruders=[obj.intruders,intruder];
             Cmnf.logc(obj, ['Adding intruder id: ',mat2str(intruder.id),' position: ',mat2str(intruder.localPosition),' velocity: ',mat2str(intruder.localVelocity), ' TOD: ',mat2str(intruder.detectionTime),' s' ] );
@@ -595,6 +651,8 @@ classdef MissionControl<RullableObject
         end
         
         function r=addIntruders(obj,intruders)
+            %Register all received ADS-B message into the register,
+            %   intruders - list of AbstractAdversary implementations
             for intruder=intruders
                 obj.addIntruder(intruder);
             end
@@ -602,6 +660,9 @@ classdef MissionControl<RullableObject
         end
         
         function r=testIntruderDetection(obj,intruder)
+            % Test if intruder is impacting the operational space of UAS
+            %   (out) r - boolean value if intruder should be considered
+            %   intruder - one intruder object
             if intruder.isFirstDetection(obj.simulationTime)
                lpos=intruder.localPosition;
                lvel=intruder.localPosition+intruder.localVelocity;
@@ -619,6 +680,8 @@ classdef MissionControl<RullableObject
         end
         
         function r=getDetectedIntruders(obj)
+            %Get list of detected intruders which impacts operaitonal range
+            %   (out) r - list of impacting intruders
             r=[];
             for intruder=obj.intruders
                 if obj.testIntruderDetection(intruder)
@@ -628,6 +691,9 @@ classdef MissionControl<RullableObject
         end
         
         function r=getIntruderPositionAndVelocityOnTime(obj,intruder)
+            %Linear position/orientaiton of intruder calculation   
+            %   (out) r - pos-or vectort
+            %   intruder abstract intruder implementaiton
             simTime=obj.simulationTime;
             pos=intruder.posTime(1:3,:);
             time=intruder.posTime(4,:);
@@ -641,6 +707,9 @@ classdef MissionControl<RullableObject
         end
         
         function r=getIntrudersPositionAndVelocityOnTime(obj,detectedIntruders)
+            %[Iterator] Linear position/orientaiton of intruders calculation   
+            %   (out) r - pos-or vectors
+            %   intruder -list of  Abstract Intruder implementaitons
             if nargin ==1
                 detectedIntruders = obj.getDetectedIntruders;
             end
@@ -651,6 +720,8 @@ classdef MissionControl<RullableObject
         end
         
         function r=createLocalAdversarialObjects(obj,detectedIntruders)
+            %[Helper] create local adversaries based on detected intruders
+            %   detectedIntruders - list of detected intruders
             if nargin ==1
                 detectedIntruders = obj.getDetectedIntruders;
             end
@@ -699,6 +770,10 @@ classdef MissionControl<RullableObject
         end
         
         function r=intersectIntrudersWithGrid(obj,ag,detectedIntruders)
+            %[Internal] intersects intruders with avoidance grid
+            %   (out) r - count of hitted cels with intruders models
+            %   ag - avoidance grid to intersect intruders
+            %   detectedIntruders - list of active intruders
             if nargin==1
                 ag=obj.avoidanceGrid;
                 detectedIntruders=obj.getDetectedIntruders;
@@ -715,7 +790,9 @@ classdef MissionControl<RullableObject
             end
         end
         %% Plot functions
+        
         function r=plotWaypoints(obj)
+            % Plots waypoints, returns count of plotted waypoints
             Cmnf.logc(obj,'[PLOT] Starting waypoint plotting')
             k=1;
             for wp=obj.waypoints
@@ -752,6 +829,7 @@ classdef MissionControl<RullableObject
         end
         
         function r=plotMissionStaticContent(obj)
+            %[Interface] plotting mission static content
             obj.plotWaypoints;
             obj.plotObstacles;
             obj.plotStaticConstraints;
@@ -763,6 +841,7 @@ classdef MissionControl<RullableObject
         end
         
         function r=plotMissionTrajectory(obj)
+            %Plots mission flew trajectory (Common/Cmnf - config)
             hold on
             %plot flew trajectory
             handles=obj.vehicle.plotTrajectory(obj.trajectoryColor);
@@ -803,6 +882,10 @@ classdef MissionControl<RullableObject
         end
         
         function r=plotGridSlice(obj,ag,statType,fig)
+            % Plots statistics on grid slice, for specific avoidance grid and figure handle/id
+            %   ag - avoidance/navigation grid object reference
+            %   statType - statistic type enumeration member to be displayed
+            %   fig - target figure handle/id
             figure(fig)
             layCount=ag.countVertical;
             if layCount < 2
@@ -824,7 +907,7 @@ classdef MissionControl<RullableObject
         end
         
         function r=plotObstacletoDistanceStatistic(obj)
-            % retrieve statistical data;
+            % Plot obstacle distacne statistics in graph
             smd=obj.calculateDistanceToObstacleStatistic;
             wsmd=[];
             % create intersections of various levels
@@ -905,6 +988,7 @@ classdef MissionControl<RullableObject
         end
         
         function r=plotRealvsPlanTrajectoryStatistics(obj)
+            %Plots differential graph
             x_pos=obj.vehicle.state.x_pos;
             y_pos=obj.vehicle.state.y_pos;
             z_pos=obj.vehicle.state.z_pos;
@@ -1036,6 +1120,7 @@ classdef MissionControl<RullableObject
         end
         
         function plotDetectedIntruders(obj,detectedIntruders)
+            %Plots detected intruders positions and past trajectories
             if nargin == 1 
                 Cmnf.logc(obj,'[PLOT] No Intruders detected attempting intruder detection');
                 detectedIntruders=obj.getDetectedIntruders;
@@ -1050,6 +1135,7 @@ classdef MissionControl<RullableObject
         end
         
         function plotRemoveLastTrajectoryFromMissionFigure(obj)
+            %[Helper] Removes unecessary plot partition to create illusion of the movement
             if ~isempty(obj.lastTrajectoryPlotHandles)
                 for handle=obj.lastTrajectoryPlotHandles
                     delete(handle);
@@ -1059,6 +1145,7 @@ classdef MissionControl<RullableObject
         end
         
         function r=plotAndCalculateComputationTime(obj)
+            %Computation load statistics graph creation
             hold on 
             avd = obj.avoidanceRunDuration;
             time = 1:length(avd);
@@ -1078,6 +1165,7 @@ classdef MissionControl<RullableObject
         
         %% Coordinate transformation methods
         function r=getLocalCoordiantes(obj,mat)
+            %GCF -> LCF transformation of GCF matrix
             posOr=obj.vehicle.getActualPositionOrientation;
             pos=posOr(1:3);
             rot=posOr(4:6);
@@ -1085,24 +1173,26 @@ classdef MissionControl<RullableObject
         end
         
         function r=getGlobalCoordinates(obj,mat)
+            %LCF->GCF transformation of LCF matrix
             posOr=obj.vehicle.getActualPositionOrientation;
             pos=posOr(1:3);
             rot=posOr(4:6);
             r=Cmnf.loc2glob(pos,rot,mat);
         end
         
-        %% ADS-B notification method corpus
-        %   id of intruder at UTM
-        %   intruderPosOR position and orientation at time of message
-        %                 retrieval
-        %   intruderVelocity - linearized intruder velocity vector in
-        %   global coordiante system
-        %   timeError - time offset of transition usually as 1s for
-        %   standard condiguration
-        %   radius - intruder body radius in meters in ADSB size class
-        %   thetaSpread - horizontal maneuvaribility 0-pi/2
-        %   phiSpread - vertical maneuvaribility 0-pi/2
+
         function r=notifyIntruder(obj,id,intruderPosOR,intruderVelocity,timeError,radius,thetaSpread,phiSpread)
+            % ADS-B notification method corpus
+            %   id of intruder at UTM
+            %   intruderPosOR position and orientation at time of message
+            %                 retrieval
+            %   intruderVelocity - linearized intruder velocity vector in
+            %   global coordiante system
+            %   timeError - time offset of transition usually as 1s for
+            %   standard condiguration
+            %   radius - intruder body radius in meters in ADSB size class
+            %   thetaSpread - horizontal maneuvaribility 0-pi/2
+            %   phiSpread - vertical maneuvaribility 0-pi/2
             if nargin <= 4
                 timeError = 1;               
             end
@@ -1157,6 +1247,7 @@ classdef MissionControl<RullableObject
         end
         
         function r=getVehiclePositionNotification(obj)
+            % Creates UTM position notificaiton structure
             posOr=obj.vehicle.getActualPositionOrientation;
             pos=posOr(1:3);
             or=posOr(4:6);
@@ -1166,6 +1257,7 @@ classdef MissionControl<RullableObject
         end
         
         function r=isActive(obj)
+            % Checks if mission is still active in UTM context
             if (obj.finalWaypointReachedFlag ==0)
                 r=true;
             else
@@ -1174,6 +1266,8 @@ classdef MissionControl<RullableObject
         end
         %% Predictor funtcions
         function r=predictTrajectory(obj)
+            %UTM trajectory prediction
+            %   r - set of GCF trajectory points up to the event horizon
             lastState=obj.vehicle.state.getLastState;
             movementBuffer=obj.movementBuffer;
             stepCount=length(obj.avoidanceGrid.layers); %length of layer = length of step => works only in assumption holds
@@ -1190,9 +1284,9 @@ classdef MissionControl<RullableObject
         end
         
         %% Constraint methods
-        % Put obstacle into obstacle register
-        %   obstacles - list of AbstractObstacleObject
         function r=putConstraints(obj,constraints)
+            % Put constraints into register
+            %   constraints - list of contraints
             for k=1:length(constraints)
                 constraints(k).id=obj.constraintID;
                 obj.constraintID=obj.constraintID+1;
@@ -1209,6 +1303,7 @@ classdef MissionControl<RullableObject
         
         %plot constraints
         function r=plotStaticConstraints(obj)
+            %Plot static constraints in mission contenxt
             for c = obj.constraints
                 if c.type == CostraintType.Static
                     c.plot();
@@ -1217,6 +1312,7 @@ classdef MissionControl<RullableObject
         end
         
         function r=plotMovingConstraints(obj)
+            %Plot moving constraints in mission context
             r=[];
             for c = obj.constraints
                 if c.type == CostraintType.Moving
@@ -1226,7 +1322,12 @@ classdef MissionControl<RullableObject
             end
         end
         
-        function [hcf,scf,hc,sc] = getConstraintsCandidates(obj);
+        function [hcf,scf,hc,sc] = getConstraintsCandidates(obj)
+            %Get intersection candidates with avoidance grids
+            %   hcf - indicates if hard constraints flag was set, there is an intersection of hard constraint with grid
+            %   scf - indicates if soft constraints flag was set, there is an intersection of soft constraint with grid
+            %   hc - list of impacting hard constraints
+            %   sc - list of impacting soft constraints
             % Initial data structure preparation
             obj.activeSHCostraints=[];
             obj.hardConstraintFlag=false;
@@ -1256,6 +1357,7 @@ classdef MissionControl<RullableObject
         
         % application of hard constraints one by one
         function r=applyHardConstraints(obj,ag)
+            %Applies hard constraints on avoidance grid
             r=0;
             mc=obj;
             for cc = obj.activeSHCostraints
@@ -1265,6 +1367,7 @@ classdef MissionControl<RullableObject
         
         % moving constraints
         function movingConstraints=moveConstraints(obj)
+            %Applies moving constraints on avoidance grid
             mc=obj; 
             movingConstraints=[];
             for cc=obj.constraints
@@ -1278,6 +1381,7 @@ classdef MissionControl<RullableObject
         
         %% Rule engine create context (DO NOT CALL DIRECTLY)
         function r=createContextRuleEngine(obj)
+            % [override] creates context for rule engine
             createContextRuleEngine@RullableObject(obj);
             obj.reContext('missionControl')=obj;
             %constraints
@@ -1297,6 +1401,7 @@ classdef MissionControl<RullableObject
         
         %% Rule engine injection method
         function r=injectRuleEngine(obj,ruleEngine)
+            %[override] rule engine injection implementation
             masterFlag=injectRuleEngine@RullableObject(obj,ruleEngine);
             % TODO injection body
             obj.navigationGrid.injectRuleEngine(ruleEngine);
