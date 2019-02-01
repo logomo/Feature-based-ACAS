@@ -1,17 +1,25 @@
 classdef ExamplePolyConstraint<PolyConstraint
-    % PolyConstraint Summary of this class goes here
-    %   Detailed explanation goes here
+    % ExamplePolyConstraint overides polyconstraint
     
     properties
-        polygonType
-        scale
-        rotation
-        forcedColorFlag=true; % Maybe change in future or use base class PolyConstraints
-        forcedColor='c';
+        polygonType           % Constraint type enumeraiton member
+        scale                 % The original radius is 5 meters, if the example constraint needs to be bigger, the scale should be specified to match expectations
+        rotation              % XY plane rotation angle to match proper facing of example constraint 
+        forcedColorFlag=true; % Forced color flag, Maybe change in future or use base class PolyConstraints
+        forcedColor='c';      % Forced color value
     end
     
     methods
         function obj = ExamplePolyConstraint(type,center,scale,rotation, sh,eh,psh,peh)
+            %Constructor for example polygonial constraint
+            %   type - type of example constraint based on the enumeraiton constraint type
+            %   center - XY GCF point
+            %   scale - scale of the object
+            %   rotation - rotation of the object
+            %   sh - start height of the constraint
+            %   eh - end height of the constraint
+            %   psh - plot start height of the constraint
+            %   peh - plot end height of the constraint
             if nargin < 3
                 scale=1;
             end
@@ -47,7 +55,8 @@ classdef ExamplePolyConstraint<PolyConstraint
             obj.rotation=rotation;
         end
         
-        function handles=plot(obj) 
+        function handles=plot(obj)
+            %[Override] Plot function override
             cl=obj.getColor;
             % prepare working polygon
             [m,~] = size(obj.polygon);
@@ -75,6 +84,7 @@ classdef ExamplePolyConstraint<PolyConstraint
         end
         
         function r=getColor(obj)
+            %[Helper] returns the object color
            if obj.forcedColorFlag
                r=obj.forcedColor;
            else
@@ -83,12 +93,14 @@ classdef ExamplePolyConstraint<PolyConstraint
         end
         
         function r=forceColor(obj,col)
+            %[Helper]Force a new color based on your expectatipons
             obj.forcedColor=col;
             obj.forcedColorFlag=true;
             r=obj.forcedColor;
         end
         
         function r=getLogString(obj)
+            %[Override] Creates a log string for specific constraint object
             r=[', polynome: ',mat2str(obj.polygon),'radius: ',mat2str(obj.radius),', start height: ',mat2str(obj.startHeight),', end height: ',mat2str(obj.endHeight)];
         end
     end

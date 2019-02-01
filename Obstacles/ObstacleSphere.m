@@ -1,13 +1,17 @@
 classdef ObstacleSphere<AbstractObstacle
-    %OBSTACLESPHERE Summary of this class goes here
-    %   Detailed explanation goes here
+    %OBSTACLESPHERE Sphere obstacle
     
     properties
-        radius;
+        radius; % radius in meters
     end
     
     methods
         function obj = ObstacleSphere(center,radius,type)
+            %Constructor for sphere obstacle,
+            %   center - XYZ GCF
+            %   radius - meters
+            %   type - ObstacleType enuemration member
+            
             if nargin <=2
                 type=ObstacleType.Detected;
             end
@@ -46,6 +50,7 @@ classdef ObstacleSphere<AbstractObstacle
         end
         
         function r=getLogString(obj)
+            %[Override] Creates logString  for logging functions
             r=[' radius: ',mat2str(obj.radius),' m'];
         end
     end

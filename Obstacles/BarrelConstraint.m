@@ -1,17 +1,23 @@
 classdef BarrelConstraint<AbstractConstraint
-    %BARRELCONSTRAINT Summary of this class goes here
-    %   Detailed explanation goes here
+    %BARRELCONSTRAINT Barell constraint implementation
     
     properties
-        startHeight = -5
-        endHeight = 5
-        plotStartHeight = -5
-        plotEndHeight = -5
+        startHeight = -5        %Constraint GCF Y start
+        endHeight = 5           %Constraint GCF Y end
+        plotStartHeight = -5    %Constraint GCF Y plot limit start 
+        plotEndHeight = -5      %Constraint GCF Y plot limit end   
         radius = 0
     end
     
     methods
         function obj = BarrelConstraint(center,radius, sh,eh,psh,peh)
+            %Creates barel constraint with parameters
+            %   center - 3D GCF center point
+            %   radius - radius on XY GCF plane
+            %   sh - start height 
+            %   eh - end height
+            %   psh - plot start height
+            %   peh - plot end height
             [m,n]=size(center);
             if m == 2 || n == 2
                 if n == 2
@@ -53,6 +59,7 @@ classdef BarrelConstraint<AbstractConstraint
         
         %override in geral class
         function r=isIntersection(obj,posor,mc,node)
+            %[Override] Intersection check
             lcenter=mc.getLocalCoordiantes(obj.center);
             % if constraint is moving we need to use time intersection
             if obj.type == CostraintType.Moving
@@ -74,6 +81,7 @@ classdef BarrelConstraint<AbstractConstraint
         
         % override in general class
         function r=inRange(obj,mc)
+            %[Override] check if constaint is in range
             posor = mc.vehicle.getActualPositionOrientation;
             xy = posor(1:2);
             z = posor(3);
@@ -98,6 +106,7 @@ classdef BarrelConstraint<AbstractConstraint
         end
         
         function handles=plot(obj)
+           %[Override] Plot of the barrel constraints
            o = obj.radius*2*pi; 
            steps = round(o/Cmnf.obstaclePrecision);
            % protocyrcle = [[0;0],[obj.radius*cos(linspace(-pi,pi,steps));obj.radius*sin(linspace(-pi,pi,steps))]];
@@ -133,6 +142,7 @@ classdef BarrelConstraint<AbstractConstraint
         end
         
         function r=getLogString(obj)
+            %[Override] Creates barell log line
             r=['radius: ',mat2str(obj.radius),', start height: ',mat2str(obj.startHeight),', end height: ',mat2str(obj.endHeight)];
         end
     end

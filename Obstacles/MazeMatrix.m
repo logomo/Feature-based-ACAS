@@ -1,27 +1,28 @@
 classdef MazeMatrix<LoggableObject
-    %MAZEMATRIX Summary of this class goes here
-    %   Detailed explanation goes here
+    %MAZEMATRIX Class for easy creation of complex static avoidance scenarios
     
     properties
-        mazeMap
+        mazeMap                                             
         sideLength = 10;
-        offsetMargin = 0; %Make the buildings bigger
-        safetyMargin = 2.5;
-        lastSnapshot=[];
-        startPosition=[];
-        finalWaypoint=[];
+        offsetMargin = 0;               %Make the buildings bigger
+        safetyMargin = 2.5;             %Standard safety margin to prevent structural harm
+        lastSnapshot=[];                %The last snapshot of the map (list of obstacles/constraints)
+        startPosition=[];               %XYZ GCF Calculated start position based on maze map structure
+        finalWaypoint=[];               %XYZ GCF Calculated Goal position based on maze map structure
     end
     
     methods
         function obj = MazeMatrix(mazeMap)
-            % 0 free space;
-            % 1-4 Static constraint
-            % 5 - start 
-            % 6 - end
+            % Creates maze Matrix based on maze map nxm matrix containing numbers:
+            %   0 free space;
+            %   1-4 Static constraint
+            %   5 - start - just once
+            %   6 - end - just once
             obj.mazeMap = mazeMap;
         end
         
         function r=generateMazeObstacles(obj)
+            %Generates obstacles based on internal mazemap
             r=[];
             scale= (obj.sideLength-2*obj.offsetMargin)/2;
             [m,n] = size(obj.mazeMap);
@@ -56,6 +57,7 @@ classdef MazeMatrix<LoggableObject
         end
         
         function plot(obj)
+            %Plots maze into mission control scenario
             if isempty(obj.lastSnapshot)
                 obj.lastSnapshot = obj.generateMazeObstacles();
             end

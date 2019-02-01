@@ -1,13 +1,19 @@
 classdef PolyConstraint<BarrelConstraint
-    % PolyConstraint Summary of this class goes here
-    %   Detailed explanation goes here
+    % PolyConstraint The constraint is represented as polygone on XY GCF plane
     
     properties
-        polygon =[]    %polynomial
+        polygon =[]    %set of 2d points 
     end
     
     methods
         function obj = PolyConstraint(polygon, sh,eh,psh,peh)
+            %Constructor of polynomial object
+            %   polygon - the set of 2D GCF points
+            %   sh - start height Y GCF
+            %   eh - end height Y GCZ
+            %   psh - plot start height Y GCF
+            %   peh - plot end height Y GCZ
+            
             % 2D polygon with dimensions N:2 is expected 
             if length(polygon)~= 2
                 wpol = polygon';
@@ -34,6 +40,7 @@ classdef PolyConstraint<BarrelConstraint
         end
         
         function r=applyMovement(obj,mc)
+            %[Override] apply movement 
             offset=obj.velocityVector;
             xyof=offset(1:2);
             % Move polygon
@@ -44,6 +51,7 @@ classdef PolyConstraint<BarrelConstraint
         end
         
         function handles=plot(obj) 
+            %[override] plot function into mission control situational awarness
             cl=obj.getColor;
             % prepare working polygon
             [m,~] = size(obj.polygon);
@@ -72,6 +80,7 @@ classdef PolyConstraint<BarrelConstraint
         end
         
         function r=getLogString(obj)
+            %[Override] get log string
             r=[', polynome: ',mat2str(obj.polygon),'radius: ',mat2str(obj.radius),', start height: ',mat2str(obj.startHeight),', end height: ',mat2str(obj.endHeight)];
         end
     end

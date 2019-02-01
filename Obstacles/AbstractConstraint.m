@@ -1,6 +1,5 @@
 classdef AbstractConstraint<LoggableObject
-    %ABSTRACTOBSTACLE Summary of this class goes here
-    %   Detailed explanation goes here
+    %ABSTRACTOBSTACLE represents abstract constraints
     
     properties
         id=0;                               % Can not BE 0 sholuld be set by MissionControl
@@ -18,11 +17,13 @@ classdef AbstractConstraint<LoggableObject
     methods
         %% Common methods - for constraints the point intersection method is obsolete, it is possible to generate points - see poly plot methods
         function r=getPoints(obj)
+            %Gets points of the obstacle
             r=obj.points;
         end
         
         %%Moving constraints functionality
         function r=dynamize(obj,position,velocity,initialTime)
+            %Moving constraints functionalit
             if nargin <=3
                 obj.initialTime = 0;
             else
@@ -34,6 +35,7 @@ classdef AbstractConstraint<LoggableObject
         end
         
         function r=applyMovement(obj,mc)
+            % applies movement on the constraint
             simTime=max(mc.vehicle.state.time);
             relTime=simTime - obj.initialTime;
             obj.center=obj.initialPosition + obj.velocityVector*relTime;
@@ -48,6 +50,7 @@ classdef AbstractConstraint<LoggableObject
         end
         
         function r=estimateCenter(obj,time)
+            %estimates new center of abstract constraint
             relTime=time - obj.initialTime;
             r=obj.initialPosition + obj.velocityVector*relTime;
         end
@@ -55,6 +58,7 @@ classdef AbstractConstraint<LoggableObject
       
         % Do not override - only for presentation purposes
         function r=getColor(obj)
+            %Returns color of constraints
             r=[1,1,1];
             if obj.type == CostraintType.Static
                r=[1 0 0]; 
@@ -65,16 +69,19 @@ classdef AbstractConstraint<LoggableObject
         end
         
         %override in geral class
-        function r=isIntersection(obj,posor,mc)      
+        function r=isIntersection(obj,posor,mc)
+            %Cell intersection calculation
             r = true;
         end
         
         % override in general class
         function r=inRange(obj,mc)
+            %Range check function
             r= true;
         end
         
         function handles=plot(obj)
+            %Plot abstract constraint
             handles=[];
             [m,n]=size(obj.points);
             hold on
@@ -88,6 +95,7 @@ classdef AbstractConstraint<LoggableObject
         end
         
         function r=getLogString(obj)
+            %Creates log string - override
             r='';
         end
     end
