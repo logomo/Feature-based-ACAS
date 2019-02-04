@@ -1,3 +1,4 @@
+%% Scenario 7.4.1 Rule-based Converging
 clear
 
 %Avoidance setup

@@ -1,3 +1,4 @@
+%% Scenario 7.4.3 Rule based mixed head on with converging
 clear
 
 %Avoidance setup

@@ -1,3 +1,4 @@
+%% Undocumented avoidance scenarion of known trap (forced map following)
 clear
 
 navigationType=ReachSetCalculation.ACASLike;

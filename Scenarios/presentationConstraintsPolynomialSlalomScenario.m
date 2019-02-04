@@ -1,3 +1,4 @@
+%% Scenario 7.3.1 Slalom with hidden waypoint
 clear
 
 navigationType=ReachSetCalculation.ACASLike;

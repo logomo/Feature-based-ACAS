@@ -1,3 +1,4 @@
+%% Scenario 7.5.2 Adversary behaviour impact 
 clear
 
 %Avoidance setup

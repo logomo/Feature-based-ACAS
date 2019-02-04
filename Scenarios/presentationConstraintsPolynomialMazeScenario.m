@@ -1,3 +1,4 @@
+%%Scenario 7.3.3 Maze solver
 clear
 
 navigationType=ReachSetCalculation.ACASLike;
